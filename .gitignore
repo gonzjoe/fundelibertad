@@ -5,7 +5,7 @@ dist/
 # Dependencies
 node_modules/
 
-# Environment
+# Environment & local secrets
 .env
 .env.*
 !.env.example
@@ -16,6 +16,15 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# System Files
+# System & OS Files
 .DS_Store
 Thumbs.db
+*.tmp
+*.bak
+*.swp
+*~
+*.log
+
+# Temporary test / scratch files
+scratch/
+temp/
