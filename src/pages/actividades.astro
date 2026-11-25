@@ -42,5 +42,5 @@ const mappedActivities: WPActivityItem[] = wpPosts.map((post) => {
   title="Actividades y Eventos | FUNDELIBERTAD"
   description="Jornadas de atención, foros, talleres comunitarios y eventos de integración ciudadana."
 >
-  <ActivitiesSection client:load wpActivities={mappedActivities} />
+  <ActivitiesSection client:idle wpActivities={mappedActivities} />
 </Layout>
