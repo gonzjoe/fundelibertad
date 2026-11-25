@@ -32,6 +32,8 @@ const resolvedSrc = typeof src === 'string' ? src : src?.src || '';
       } ${imgClassName}`}
       referrerpolicy="no-referrer"
       loading={priority ? 'eager' : 'lazy'}
+      fetchpriority={priority ? 'high' : 'auto'}
+      decoding="async"
       onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
     />
   )}

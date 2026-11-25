@@ -39,10 +39,12 @@ const getWordExcerpt = (textOrHtml: string, maxWords: number = 50): string => {
     {/* Background Image with elegant overlay */}
     <div class="absolute inset-0 z-0">
       <img
-        src="https://lh3.googleusercontent.com/d/1mzMGHUgDdHcX8hpf8DTMLIs2Dv53CCsd"
+        src={url('/banner-home.jpg')}
         alt="FUNDELIBERTAD Paz y Derechos Humanos en Colombia"
         class="w-full h-full object-cover object-center opacity-65 scale-102"
-        referrerpolicy="no-referrer"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
       />
       <div class="absolute inset-0 bg-gradient-to-r from-[#14324f]/90 via-[#3B82C1]/60 to-[#14324f]/30"></div>
       <div class="absolute inset-0 bg-gradient-to-t from-[#14324f]/70 via-transparent to-[#14324f]/20"></div>
