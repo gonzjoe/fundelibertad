@@ -10,6 +10,10 @@ export function url(path: string = ''): string {
     return BASE_URL ? `${BASE_URL}/` : '/';
   }
   let cleanPath = path.startsWith('/') ? path : `/${path}`;
+  // If cleanPath already starts with BASE_URL, strip it first to avoid double base prefix
+  if (BASE_URL && cleanPath.startsWith(BASE_URL)) {
+    cleanPath = cleanPath.slice(BASE_URL.length) || '/';
+  }
   // Si no es un archivo (con extensión como .xml, .png, .jpg) y no termina en '/', añadir '/'
   if (!cleanPath.includes('.') && !cleanPath.endsWith('/')) {
     cleanPath += '/';
