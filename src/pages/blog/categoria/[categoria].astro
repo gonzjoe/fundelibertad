@@ -35,11 +35,6 @@ const { categoryName, posts } = Astro.props;
 <PageLayout
   title={`Categoría: ${categoryName} | Blog FUNDELIBERTAD`}
   description={`Artículos, informes y novedades publicadas bajo la categoría ${categoryName}.`}
-  breadcrumbs={[
-    { label: 'Blog', href: '/blog' },
-    { label: 'Categorías', href: '/blog/categoria' },
-    { label: categoryName },
-  ]}
 >
   <div class="space-y-10">
     <header class="max-w-3xl space-y-3">
