@@ -4,11 +4,11 @@
  */
 
 import type { Service, Project, Activity } from './types';
-import projectKungfuNewImg from './assets/images/project_kungfu_paz_new_1782507851349.jpg';
-import footballImg from './assets/images/futbol_social_comunitario.jpg';
-import familyHumanizationImg from './assets/images/family_humanization_project_1782495984213.jpg';
-import conversatorioPazImg from './assets/images/conversatorio_paz_1782916002667.jpg';
-import conversatorioEjercitoImg from './assets/images/conversatorio_ejercito_1782943297764.jpg';
+import projectKungfuNewImg from '../assets/images/project_kungfu_paz_new_1782507851349.jpg';
+import footballImg from '../assets/images/futbol_social_comunitario.jpg';
+import familyHumanizationImg from '../assets/images/family_humanization_project_1782495984213.jpg';
+import conversatorioPazImg from '../assets/images/conversatorio_paz_1782916002667.jpg';
+import conversatorioEjercitoImg from '../assets/images/conversatorio_ejercito_1782943297764.jpg';
 
 export const IMPACT_STATS = [
   {
