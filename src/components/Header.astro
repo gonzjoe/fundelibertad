@@ -1,0 +1,373 @@
+---
+import { url } from '../lib/base';
+
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = '/' } = Astro.props;
+
+const menuItems = [
+  { label: 'Inicio', path: url('/'), id: 'home' },
+  { label: 'Nosotros', path: url('/nosotros'), id: 'about' },
+  { label: 'Servicios', path: url('/servicios'), id: 'services' },
+  { label: 'Proyectos', path: url('/proyectos'), id: 'projects' },
+];
+
+const programSubsections = [
+  { 
+    label: 'Prácticas y Pasantías', 
+    path: url('/programas/practicas-pasantias'), 
+    id: 'internships', 
+    color: 'text-blue-600',
+    icon: 'graduation'
+  },
+  { 
+    label: 'Informes y Denuncias de DDHH', 
+    path: url('/programas/informes-denuncias-ddhh'), 
+    id: 'reports', 
+    color: 'text-amber-600',
+    icon: 'warning'
+  },
+  { 
+    label: 'Asesoría Jurídica Comunitaria', 
+    path: url('/programas/asesoria-juridica-comunitaria'), 
+    id: 'legal', 
+    color: 'text-emerald-600',
+    icon: 'scale'
+  },
+];
+
+const homePath = url('/');
+const isCurrentPath = (path: string) => {
+  if (path === homePath) {
+    return currentPath === homePath || currentPath === `${homePath}/` || currentPath.endsWith('/inicio') || currentPath === '/';
+  }
+  return currentPath === path || (path !== homePath && currentPath.startsWith(path));
+};
+
+const isProgramsActive = currentPath.includes('/programas') ||
+  currentPath.includes('/practicas-pasantias') ||
+  currentPath.includes('/informes-denuncias-ddhh') ||
+  currentPath.includes('/asesoria-juridica-comunitaria');
+---
+
+<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-sky-100" id="main-header">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-20">
+      {/* Logo Brand */}
+      <a 
+        href={url('/')}
+        id="brand-logo-container"
+        class="cursor-pointer select-none group flex items-center"
+      >
+        <img 
+          src="https://lh3.googleusercontent.com/d/1nD4GYM2rbdNHtX0xdR3yI0XlC7MQfzps"
+          alt="FUNDELIBERTAD Logo"
+          class="h-8 sm:h-10 md:h-12 w-auto object-contain"
+          referrerpolicy="no-referrer"
+          id="header-logo-image"
+        />
+      </a>
+
+      {/* Desktop Navigation */}
+      <nav class="hidden lg:flex items-center gap-1.5" id="desktop-nav">
+        {menuItems.map((item) => (
+          <a
+            id={`nav-${item.id}-btn`}
+            href={item.path}
+            class={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+              isCurrentPath(item.path)
+                ? 'bg-sky-50 text-brand-primary font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            {item.label}
+          </a>
+        ))}
+
+        {/* Programs Dropdown */}
+        <div 
+          class="relative group/dropdown"
+          id="programs-dropdown-trigger"
+        >
+          <button
+            id="nav-programs-btn"
+            type="button"
+            class={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+              isProgramsActive
+                ? 'bg-sky-50 text-brand-primary font-semibold'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            Programas
+            <svg class="w-4 h-4 transition-transform duration-200 group-hover/dropdown:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </button>
+
+          <div
+            class="invisible opacity-0 group-hover/dropdown:visible group-hover/dropdown:opacity-100 transition-all duration-150 transform translate-y-1 group-hover/dropdown:translate-y-0 absolute left-0 mt-1 w-72 rounded-xl bg-white shadow-xl border border-sky-100 p-2 text-slate-800 z-50 pointer-events-none group-hover/dropdown:pointer-events-auto"
+            id="programs-dropdown-menu"
+          >
+            {programSubsections.map((sub) => (
+              <a
+                id={`nav-sub-${sub.id}-btn`}
+                href={sub.path}
+                class="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-sky-50/50 text-left transition-colors cursor-pointer group"
+              >
+                <div class={`p-1.5 rounded-lg bg-slate-50 group-hover:bg-white group-hover:shadow-xs transition-colors shrink-0 ${sub.color}`}>
+                  {sub.icon === 'graduation' && (
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21.42 10.922a1 1 0 0 0-.019-.838L12.83 2.18a2 2 0 0 0-1.66 0L2.6 10.08a1 1 0 0 0 0 1.832l8.57 7.908a2 2 0 0 0 1.66 0l8.57-7.9a1 1 0 0 0 .02-.998Z"/>
+                      <path d="M22 10v6"/>
+                      <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>
+                    </svg>
+                  )}
+                  {sub.icon === 'warning' && (
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                      <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+                      <path d="M12 9v4"/>
+                      <path d="M12 17h.01"/>
+                    </svg>
+                  )}
+                  {sub.icon === 'scale' && (
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                      <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                      <path d="M7 21h10"/>
+                      <path d="M12 3v18"/>
+                      <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+                    </svg>
+                  )}
+                </div>
+                <div>
+                  <p class="text-xs font-bold text-slate-900 leading-normal">{sub.label}</p>
+                  <p class="text-[10px] text-slate-400 mt-0.5 leading-normal">Formularios de postulación y registro</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        <a
+          id="nav-activities-btn"
+          href={url('/actividades')}
+          class={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+            isCurrentPath(url('/actividades'))
+              ? 'bg-sky-50 text-brand-primary font-semibold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          Actividades
+        </a>
+
+        <a
+          id="nav-contact-btn"
+          href={url('/contacto')}
+          class={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+            isCurrentPath(url('/contacto'))
+              ? 'bg-sky-50 text-brand-primary font-semibold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+          }`}
+        >
+          Contacto
+        </a>
+      </nav>
+
+      {/* Action buttons (Donation) */}
+      <div class="hidden lg:flex items-center gap-2.5">
+        <button
+          id="header-donate-btn"
+          type="button"
+          class="px-5 py-2.5 bg-brand-red text-white text-sm font-bold rounded-xl shadow-md hover:bg-red-700 hover:shadow-red-200 active:scale-98 transition-all flex items-center gap-1.5 cursor-pointer"
+        >
+          <svg class="w-4 h-4 fill-white text-white" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+          Donar Ahora
+        </button>
+      </div>
+
+      {/* Mobile Menu Button */}
+      <div class="lg:hidden flex items-center gap-2">
+        <button
+          id="hamburger-btn"
+          type="button"
+          aria-label="Abrir menú"
+          aria-expanded="false"
+          class="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-slate-200 cursor-pointer"
+        >
+          <svg id="hamburger-icon-open" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
+          </svg>
+          <svg id="hamburger-icon-close" class="w-6 h-6 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Mobile Menu Drawer */}
+  <div
+    class="hidden lg:hidden bg-white border-t border-sky-100 overflow-hidden"
+    id="mobile-nav-drawer"
+  >
+    <div class="px-4 pt-2 pb-6 space-y-1.5 text-slate-800">
+      {menuItems.map((item) => (
+        <a
+          id={`mobile-nav-${item.id}-btn`}
+          href={item.path}
+          class={`block w-full text-left px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+            isCurrentPath(item.path)
+              ? 'bg-sky-50 text-brand-primary font-bold'
+              : 'hover:bg-slate-50'
+          }`}
+        >
+          {item.label}
+        </a>
+      ))}
+
+      {/* Programs list for mobile */}
+      <div class="border-t border-slate-100 pt-2 mt-2">
+        <span class="px-4 text-xs font-bold text-slate-400 uppercase tracking-widest block mb-1">
+          Programas e Incidentes
+        </span>
+        {programSubsections.map((sub) => (
+          <a
+            id={`mobile-sub-nav-${sub.id}-btn`}
+            href={sub.path}
+            class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-slate-50 text-left text-sm"
+          >
+            <div class={`w-4 h-4 shrink-0 ${sub.color}`}>
+              {sub.icon === 'graduation' && (
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.42 10.922a1 1 0 0 0-.019-.838L12.83 2.18a2 2 0 0 0-1.66 0L2.6 10.08a1 1 0 0 0 0 1.832l8.57 7.908a2 2 0 0 0 1.66 0l8.57-7.9a1 1 0 0 0 .02-.998Z"/>
+                  <path d="M22 10v6"/>
+                  <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>
+                </svg>
+              )}
+              {sub.icon === 'warning' && (
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/>
+                  <path d="M14 2v4a2 2 0 0 0 2 2h4"/>
+                  <path d="M12 9v4"/>
+                  <path d="M12 17h.01"/>
+                </svg>
+              )}
+              {sub.icon === 'scale' && (
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                  <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                  <path d="M7 21h10"/>
+                  <path d="M12 3v18"/>
+                  <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+                </svg>
+              )}
+            </div>
+            <span class="font-medium text-slate-700">{sub.label}</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="border-t border-slate-100 pt-2 mt-2 space-y-1">
+        <a
+          id="mobile-nav-activities-btn"
+          href={url('/actividades')}
+          class={`block w-full text-left px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+            isCurrentPath(url('/actividades')) ? 'bg-sky-50 text-brand-primary font-bold' : 'hover:bg-slate-50'
+          }`}
+        >
+          Actividades
+        </a>
+        <a
+          id="mobile-nav-contact-btn"
+          href={url('/contacto')}
+          class={`block w-full text-left px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+            isCurrentPath(url('/contacto')) ? 'bg-sky-50 text-brand-primary font-bold' : 'hover:bg-slate-50'
+          }`}
+        >
+          Contacto
+        </a>
+      </div>
+
+      {/* Mobile CTA */}
+      <div class="pt-4 border-t border-slate-100 flex flex-col gap-2.5">
+        <button
+          id="mobile-header-donate-btn"
+          type="button"
+          class="w-full py-3 bg-brand-red text-white text-center font-bold rounded-xl shadow-md hover:bg-red-700 flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <svg class="w-5 h-5 fill-white text-white" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+          Donar Ahora
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  function setupHeader() {
+    // Donate buttons
+    const donateButtons = document.querySelectorAll('#header-donate-btn, #mobile-header-donate-btn');
+    donateButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('open-donation-modal'));
+        const drawer = document.getElementById('mobile-nav-drawer');
+        if (drawer && !drawer.classList.contains('hidden')) {
+          drawer.classList.add('hidden');
+          const openIcon = document.getElementById('hamburger-icon-open');
+          const closeIcon = document.getElementById('hamburger-icon-close');
+          openIcon?.classList.remove('hidden');
+          closeIcon?.classList.add('hidden');
+        }
+      });
+    });
+
+    // Mobile Hamburger
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileDrawer = document.getElementById('mobile-nav-drawer');
+    const openIcon = document.getElementById('hamburger-icon-open');
+    const closeIcon = document.getElementById('hamburger-icon-close');
+
+    if (hamburgerBtn && mobileDrawer) {
+      hamburgerBtn.addEventListener('click', () => {
+        const isHidden = mobileDrawer.classList.toggle('hidden');
+        const isExpanded = !isHidden;
+        hamburgerBtn.setAttribute('aria-expanded', String(isExpanded));
+        if (isExpanded) {
+          openIcon?.classList.add('hidden');
+          closeIcon?.classList.remove('hidden');
+        } else {
+          openIcon?.classList.remove('hidden');
+          closeIcon?.classList.add('hidden');
+        }
+      });
+    }
+
+    // Mobile Dropdown click support for touch devices
+    const programsBtn = document.getElementById('nav-programs-btn');
+    const programsDropdown = document.getElementById('programs-dropdown-menu');
+    if (programsBtn && programsDropdown) {
+      programsBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        programsDropdown.classList.toggle('invisible');
+        programsDropdown.classList.toggle('opacity-0');
+        programsDropdown.classList.toggle('pointer-events-none');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!programsBtn.contains(e.target as Node) && !programsDropdown.contains(e.target as Node)) {
+          programsDropdown.classList.add('invisible', 'opacity-0', 'pointer-events-none');
+        }
+      });
+    }
+  }
+
+  setupHeader();
+  document.addEventListener('astro:page-load', setupHeader);
+</script>

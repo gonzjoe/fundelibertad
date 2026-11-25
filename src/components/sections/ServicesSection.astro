@@ -1,0 +1,213 @@
+---
+/**
+ * ServicesSection nativo en Astro con filtrado y búsqueda ultra rápida en Vanilla JS.
+ * (0 KB React / 0 KB Motion). Idéntico en iconos, colores y tarjetas.
+ */
+import { SERVICES_LIST } from '../../data';
+import { url } from '../../lib/base';
+
+const categories = [
+  { id: 'all', label: 'Todos los Servicios' },
+  { id: 'human-rights', label: 'Derechos Humanos y Paz' },
+  { id: 'legal', label: 'Asesorías Jurídicas' },
+  { id: 'academic', label: 'Convenios y Prácticas' },
+];
+---
+
+<div class="space-y-10 pb-16 font-sans text-left animate-fade-in" id="services-section-container">
+  {/* Introduction banner */}
+  <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-xs space-y-4">
+    <span class="text-xs font-bold text-sky-800 uppercase tracking-widest block">Áreas de Apoyo</span>
+    <h1 class="font-display font-black text-3xl sm:text-4xl text-brand-dark tracking-tight leading-none">
+      Asesoría Integral y Servicios Gratuitos
+    </h1>
+    <div class="w-16 h-1 bg-brand-green rounded-full"></div>
+    <p class="text-sm text-slate-600 max-w-3xl leading-relaxed">
+      Orientación jurídica especializada, apoyo psicosocial y convenios interinstitucionales para comunidades y familias de la Comuna 15 Guayabal y Medellín.
+    </p>
+  </div>
+
+  {/* Category Filter Pills and Search */}
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4" id="services-filter-bar">
+    <div class="flex flex-wrap items-center gap-2" id="services-category-filters">
+      {categories.map((cat, idx) => (
+        <button
+          type="button"
+          data-category={cat.id}
+          class={`srv-cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
+            idx === 0
+              ? 'bg-slate-900 text-white shadow-xs'
+              : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300'
+          }`}
+        >
+          {cat.label}
+        </button>
+      ))}
+    </div>
+
+    {/* Search Input */}
+    <div class="relative w-full lg:max-w-xs">
+      <input
+        type="text"
+        id="services-search-input"
+        placeholder="Buscar asesoría..."
+        class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 shadow-xs"
+      />
+      <button
+        id="clear-services-search"
+        type="button"
+        class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+
+  {/* Cards Grid */}
+  <div class="space-y-6">
+    <div
+      id="services-empty-state"
+      class="hidden bg-white rounded-2xl p-12 text-center border border-slate-100 shadow-xs space-y-3"
+    >
+      <p class="text-slate-500 text-sm">
+        No se encontraron asesorías con ese criterio de búsqueda.
+      </p>
+      <button
+        id="reset-services-filter"
+        type="button"
+        class="text-xs font-bold text-sky-700 hover:underline cursor-pointer"
+      >
+        Ver todos los servicios
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="services-cards-grid">
+      {SERVICES_LIST.map((srv) => (
+        <div
+          id={`srv-card-${srv.id}`}
+          data-category={srv.category}
+          data-search={`${srv.title} ${srv.description} ${srv.category}`.toLowerCase()}
+          class="service-card bg-white rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-xs transition-all overflow-hidden flex flex-col justify-between"
+        >
+          <div class="p-6 space-y-4">
+            <div class="flex items-center justify-between gap-4">
+              <div class="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                </svg>
+              </div>
+              <span class="text-[9px] font-black uppercase tracking-wider bg-slate-50 text-slate-400 px-2.5 py-0.5 rounded-full border border-slate-100">
+                {srv.category === 'human-rights' ? 'DDHH' : srv.category === 'academic' ? 'ACADÉMICO' : srv.category === 'legal' ? 'DERECHO' : 'SOCIAL'}
+              </span>
+            </div>
+
+            <div class="space-y-1.5">
+              <h3 class="font-display font-bold text-sm text-slate-900 group-hover:text-sky-700">
+                {srv.title}
+              </h3>
+              <p class="text-xs text-slate-500 leading-relaxed">
+                {srv.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Trust banner */}
+  <div class="bg-sky-50/50 rounded-2xl p-6 border border-sky-100 grid grid-cols-1 md:grid-cols-3 gap-6 text-center md:text-left">
+    <div>
+      <h4 class="font-display font-bold text-sm text-slate-950">Atención Directa</h4>
+      <p class="text-[11px] text-slate-500 mt-0.5 leading-normal">Sin intermediarios ni costos asociados. Tu información está resguardada confidencialmente.</p>
+    </div>
+    <div class="border-t md:border-t-0 md:border-l border-sky-100 md:pl-6">
+      <h4 class="font-display font-bold text-sm text-slate-950">Respaldado Constitucionalmente</h4>
+      <p class="text-[11px] text-slate-500 mt-0.5 leading-normal">Todas las solicitudes y tutelas redactadas son radicadas formalmente en los juzgados de Medellín.</p>
+    </div>
+    <div class="border-t md:border-t-0 md:border-l border-sky-100 md:pl-6">
+      <h4 class="font-display font-bold text-sm text-slate-950">Pasantías Avaladas</h4>
+      <p class="text-[11px] text-slate-500 mt-0.5 leading-normal">Los practicantes de derecho y psicología operan con supervisión directa de consultores senior habilitados.</p>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  // Filtrado instantáneo en Vanilla JS
+  (function() {
+    let activeCategory = 'all';
+    let searchQuery = '';
+
+    const cards = Array.from(document.querySelectorAll('.service-card'));
+    const buttons = Array.from(document.querySelectorAll('.srv-cat-btn'));
+    const searchInput = document.getElementById('services-search-input');
+    const clearBtn = document.getElementById('clear-services-search');
+    const emptyState = document.getElementById('services-empty-state');
+    const resetBtn = document.getElementById('reset-services-filter');
+
+    function applyFilter() {
+      let visibleCount = 0;
+      const query = searchQuery.trim().toLowerCase();
+
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category') || '';
+        const searchTarget = card.getAttribute('data-search') || '';
+
+        const matchesCat = (activeCategory === 'all') || (cat === activeCategory);
+        const matchesQuery = !query || searchTarget.includes(query);
+
+        if (matchesCat && matchesQuery) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      if (emptyState) {
+        if (visibleCount === 0) emptyState.classList.remove('hidden');
+        else emptyState.classList.add('hidden');
+      }
+
+      buttons.forEach(btn => {
+        const cat = btn.getAttribute('data-category');
+        if (cat === activeCategory) {
+          btn.className = "srv-cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer bg-slate-900 text-white shadow-xs";
+        } else {
+          btn.className = "srv-cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300";
+        }
+      });
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCategory = btn.getAttribute('data-category') || 'all';
+        applyFilter();
+      });
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      if (clearBtn) {
+        if (searchQuery) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+      applyFilter();
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      searchQuery = '';
+      clearBtn.classList.add('hidden');
+      applyFilter();
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      activeCategory = 'all';
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      if (clearBtn) clearBtn.classList.add('hidden');
+      applyFilter();
+    });
+  })();
+</script>

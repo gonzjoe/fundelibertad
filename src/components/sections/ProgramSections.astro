@@ -1,28 +1,24 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { 
-  GraduationCap, AlertTriangle, Scale, 
-  Phone, Mail, Info, Lock, ChevronRight 
-} from 'lucide-react';
-
+---
 import internshipImg from '../../assets/images/fundelibertad_internship_1782489676477.jpg';
 import reportsImg from '../../assets/images/fundelibertad_reports_1782489690540.jpg';
 import legalImg from '../../assets/images/fundelibertad_legal_1782489703836.jpg';
-import AdaptiveImage from '../AdaptiveImage';
-import type { WPActivityItem } from './ActivitiesSection';
+import AdaptiveImage from '../AdaptiveImage.astro';
+import type { WPActivityItem } from './ActivitiesSection.astro';
 import { url } from '../../lib/base';
 
-interface ProgramSectionsProps {
+interface Props {
   initialSubsection?: string;
   initialInternshipPosts?: WPActivityItem[];
   initialReportsPosts?: WPActivityItem[];
   initialLegalPosts?: WPActivityItem[];
 }
+
+const { 
+  initialSubsection = 'internships', 
+  initialInternshipPosts = [],
+  initialReportsPosts = [],
+  initialLegalPosts = []
+} = Astro.props;
 
 const SUBSECTION_MAP: Record<string, string> = {
   'internships': 'internships',
@@ -39,11 +35,10 @@ const SUBSECTION_MAP: Record<string, string> = {
   'asesoria-legal': 'legal'
 };
 
-const TAB_URL_MAP: Record<string, string> = {
-  'internships': '/programas/practicas-pasantias',
-  'reports': '/programas/informes-denuncias-ddhh',
-  'legal': '/programas/asesoria-juridica-comunitaria',
-};
+const activeTab = SUBSECTION_MAP[initialSubsection] || initialSubsection;
+const internshipPosts = initialInternshipPosts;
+const reportsPosts = initialReportsPosts;
+const legalPosts = initialLegalPosts;
 
 const getWordExcerpt = (textOrHtml: string, maxWords: number = 50): string => {
   if (!textOrHtml) return '';
@@ -64,271 +59,127 @@ const getWordExcerpt = (textOrHtml: string, maxWords: number = 50): string => {
   if (words.length <= maxWords) return plain;
   return words.slice(0, maxWords).join(' ') + '...';
 };
+---
 
-export default function ProgramSections({ 
-  initialSubsection = 'internships', 
-  initialInternshipPosts = [],
-  initialReportsPosts = [],
-  initialLegalPosts = []
-}: ProgramSectionsProps) {
-  const resolveTab = () => {
-    return SUBSECTION_MAP[initialSubsection] || initialSubsection;
-  };
-
-  const [activeTab, setActiveTab] = useState<string>(resolveTab());
-  const [internshipPosts, setInternshipPosts] = useState<WPActivityItem[]>(initialInternshipPosts);
-  const [reportsPosts, setReportsPosts] = useState<WPActivityItem[]>(initialReportsPosts);
-  const [legalPosts, setLegalPosts] = useState<WPActivityItem[]>(initialLegalPosts);
-
-  useEffect(() => {
-    setActiveTab(SUBSECTION_MAP[initialSubsection] || initialSubsection);
-  }, [initialSubsection]);
-
-  // Sincronización en vivo desde WordPress para Prácticas y Pasantías e Informes/Denuncias
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchLivePosts = async () => {
-      try {
-        const res = await fetch('https://www.csm.fundelibertad.org/wp-json/wp/v2/posts?_embed=1&per_page=50');
-        if (!res.ok) return;
-        const rawPosts = await res.json();
-        if (!Array.isArray(rawPosts) || !isMounted) return;
-
-        // 1. Filtrar Prácticas y Pasantías
-        const matchingInternships = rawPosts.filter((post: any) => {
-          if (post.slug === 'hello-world' || post.id === 1) return false;
-          const terms: any[] = post._embedded?.['wp:term']?.[0] || [];
-          const validTerms = terms.filter((t: any) => {
-            const name = (t.name || '').toLowerCase();
-            const slug = (t.slug || '').toLowerCase();
-            return name !== 'uncategorized' && name !== 'sin categoría' && slug !== 'uncategorized';
-          });
-          if (validTerms.length === 0) return false;
-          return validTerms.some((t: any) => {
-            const n = (t.name || '').toLowerCase();
-            const s = (t.slug || '').toLowerCase();
-            return n.includes('practica') || n.includes('práctica') || 
-                   n.includes('pasantia') || n.includes('pasantía') ||
-                   s.includes('practica') || s.includes('pasantia');
-          });
-        });
-
-        // 2. Filtrar Informes y Denuncias de DDHH
-        const matchingReports = rawPosts.filter((post: any) => {
-          if (post.slug === 'hello-world' || post.id === 1) return false;
-          const terms: any[] = post._embedded?.['wp:term']?.[0] || [];
-          const validTerms = terms.filter((t: any) => {
-            const name = (t.name || '').toLowerCase();
-            const slug = (t.slug || '').toLowerCase();
-            return name !== 'uncategorized' && name !== 'sin categoría' && slug !== 'uncategorized';
-          });
-          if (validTerms.length === 0) return false;
-          return validTerms.some((t: any) => {
-            const n = (t.name || '').toLowerCase();
-            const s = (t.slug || '').toLowerCase();
-            return n.includes('informe') || n.includes('denuncia') || 
-                   n.includes('ddhh') || n.includes('derecho') ||
-                   s.includes('informe') || s.includes('denuncia') ||
-                   s.includes('ddhh') || s.includes('derecho');
-          });
-        });
-
-        // 3. Filtrar Asesoría Jurídica Gratuita
-        const matchingLegal = rawPosts.filter((post: any) => {
-          if (post.slug === 'hello-world' || post.id === 1) return false;
-          const terms: any[] = post._embedded?.['wp:term']?.[0] || [];
-          const validTerms = terms.filter((t: any) => {
-            const name = (t.name || '').toLowerCase();
-            const slug = (t.slug || '').toLowerCase();
-            return name !== 'uncategorized' && name !== 'sin categoría' && slug !== 'uncategorized';
-          });
-          if (validTerms.length === 0) return false;
-          return validTerms.some((t: any) => {
-            const n = (t.name || '').toLowerCase();
-            const s = (t.slug || '').toLowerCase();
-            return n.includes('asesoria') || n.includes('asesoría') || 
-                   n.includes('juridica') || n.includes('jurídica') ||
-                   n.includes('legal') || n.includes('gratuita') ||
-                   s.includes('asesoria') || s.includes('juridica') ||
-                   s.includes('legal');
-          });
-        });
-
-        const mapPost = (post: any, defaultCat: string) => {
-          const terms: any[] = post._embedded?.['wp:term']?.[0] || [];
-          const catNames = terms.map((t: any) => t.name).filter((c: string) => c.toLowerCase() !== 'uncategorized' && c.toLowerCase() !== 'sin categoría');
-          const media = post._embedded?.['wp:featuredmedia']?.[0];
-          const featuredImg = media?.source_url || media?.media_details?.sizes?.large?.source_url || 'https://lh3.googleusercontent.com/d/1VOAa3Fwpv9QvlaDHN7PP8mWY-jYImtzN';
-          const dateStr = new Date(post.date).toLocaleDateString('es-CO', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric'
-          });
-
-          return {
-            id: `wp-${post.id}`,
-            title: post.title.rendered,
-            category: catNames[0] || defaultCat,
-            categories: catNames,
-            description: post.excerpt.rendered.replace(/<[^>]*>?/gm, '').trim(),
-            content: post.content.rendered,
-            image: featuredImg,
-            slug: post.slug,
-            date: dateStr,
-          };
-        };
-
-        if (isMounted) {
-          if (matchingInternships.length > 0) {
-            setInternshipPosts(matchingInternships.map(p => mapPost(p, 'Prácticas y Pasantías')));
-          }
-          if (matchingReports.length > 0) {
-            setReportsPosts(matchingReports.map(p => mapPost(p, 'Informes y Denuncias de DDHH')));
-          }
-          if (matchingLegal.length > 0) {
-            setLegalPosts(matchingLegal.map(p => mapPost(p, 'Asesoría Jurídica Gratuita')));
-          }
-        }
-      } catch (err) {
-        console.error('Error sincronizando programas desde WordPress:', err);
-      }
-    };
-
-    fetchLivePosts();
-    window.addEventListener('focus', fetchLivePosts);
-    return () => {
-      isMounted = false;
-      window.removeEventListener('focus', fetchLivePosts);
-    };
-  }, []);
-
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
-    if (TAB_URL_MAP[tab] && typeof window !== 'undefined') {
-      window.location.href = url(TAB_URL_MAP[tab]);
-    }
-  };
-
-  // Images generated previously
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 pb-16 text-left font-sans" id="program-sections-main">
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-8 pb-16 text-left font-sans" id="program-sections-main">
       {/* Sidebar navigation control */}
-      <div className="lg:col-span-1 space-y-4" id="programs-sidebar">
-        <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-2">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Canales Activos</span>
-          <h2 className="font-display font-black text-lg text-slate-900 leading-snug">Programas de Atención</h2>
+      <div class="lg:col-span-1 space-y-4" id="programs-sidebar">
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-xs space-y-2">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Canales Activos</span>
+          <h2 class="font-display font-black text-lg text-slate-900 leading-snug">Programas de Atención</h2>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <button
+        <div class="flex flex-col gap-2">
+          <a
             id="prog-tab-internships-btn"
-            onClick={() => handleTabClick('internships')}
-            className={`px-5 py-4 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between border cursor-pointer ${
+            href={url("/programas/practicas-pasantias")}
+            
+            class={`px-5 py-4 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between border cursor-pointer ${
               activeTab === 'internships'
                 ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100'
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <span className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 shrink-0" />
+            <span class="flex items-center gap-2">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-.838L12.83 2.18a2 2 0 0 0-1.66 0L2.6 10.08a1 1 0 0 0 0 1.832l8.57 7.908a2 2 0 0 0 1.66 0l8.57-7.9a1 1 0 0 0 .02-.998Z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
               Prácticas y Pasantías
             </span>
-            <ChevronRight className="w-4 h-4 shrink-0" />
-          </button>
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
 
-          <button
+          <a
             id="prog-tab-reports-btn"
-            onClick={() => handleTabClick('reports')}
-            className={`px-5 py-4 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between border cursor-pointer ${
+            href={url("/programas/informes-denuncias-ddhh")}
+            
+            class={`px-5 py-4 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between border cursor-pointer ${
               activeTab === 'reports'
                 ? 'bg-amber-600 border-amber-600 text-white shadow-md shadow-amber-100'
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <span className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 shrink-0" />
+            <span class="flex items-center gap-2">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               Informes y Denuncias de DDHH
             </span>
-            <ChevronRight className="w-4 h-4 shrink-0" />
-          </button>
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
 
-          <button
+          <a
             id="prog-tab-legal-btn"
-            onClick={() => handleTabClick('legal')}
-            className={`px-5 py-4 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between border cursor-pointer ${
+            href={url("/programas/asesoria-juridica-comunitaria")}
+            
+            class={`px-5 py-4 rounded-xl text-xs font-bold transition-all text-left flex items-center justify-between border cursor-pointer ${
               activeTab === 'legal'
                 ? 'bg-emerald-700 border-emerald-700 text-white shadow-md shadow-emerald-100'
                 : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
-            <span className="flex items-center gap-2">
-              <Scale className="w-5 h-5 shrink-0" />
+            <span class="flex items-center gap-2">
+              <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
               Asesoría Jurídica Gratuita
             </span>
-            <ChevronRight className="w-4 h-4 shrink-0" />
-          </button>
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </a>
         </div>
 
         {/* Informative advice */}
-        <div className="bg-sky-50/50 p-4.5 rounded-2xl border border-sky-100 text-slate-600 space-y-2 text-xs">
-          <div className="flex items-center gap-1.5 font-bold text-sky-800">
-            <Info className="w-4.5 h-4.5 shrink-0" />
+        <div class="bg-sky-50/50 p-4.5 rounded-2xl border border-sky-100 text-slate-600 space-y-2 text-xs">
+          <div class="flex items-center gap-1.5 font-bold text-sky-800">
+            <svg class="w-4.5 h-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
             <span>Sistema Protegido</span>
           </div>
-          <p className="leading-relaxed text-[11px]">
+          <p class="leading-relaxed text-[11px]">
             Toda la información ingresada en FUNDELIBERTAD se almacena bajo estrictos principios de confidencialidad y reserva profesional.
           </p>
         </div>
       </div>
 
       {/* Main Form/Content Workspace */}
-      <div className="lg:col-span-3">
-        <AnimatePresence mode="wait">
+      <div class="lg:col-span-3">
+        
           {/* A. SECTION: INTERNSHIPS */}
           {activeTab === 'internships' && (
-            <motion.div
+            <div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 15 }}
-              className="space-y-8"
+              class="space-y-8"
               id="internships-panel"
               key="internships"
             >
               {/* Dynamic WordPress cards for "Prácticas y Pasantías" */}
               {internshipPosts.length > 0 ? (
                 internshipPosts.map((post) => (
-                  <div key={post.id} className="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
-                      <div className={post.image ? "contents md:flex md:flex-col md:gap-y-3" : "contents md:flex md:flex-col md:gap-y-3 md:col-span-2"}>
-                        <span className="order-1 text-[10px] font-bold text-blue-600 uppercase tracking-widest block">
+                  <div key={post.id} class="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+                      <div class={post.image ? "contents md:flex md:flex-col md:gap-y-3" : "contents md:flex md:flex-col md:gap-y-3 md:col-span-2"}>
+                        <span class="order-1 text-[10px] font-bold text-blue-600 uppercase tracking-widest block">
                           {post.category || 'Prácticas y Pasantías'}
                         </span>
                         <a 
                           href={post.slug ? url(`/blog/${post.slug}`) : '#'} 
-                          className="order-3 block hover:text-blue-600 transition-colors"
+                          class="order-3 block hover:text-blue-600 transition-colors"
                         >
                           <h3 
-                            className="font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight hover:text-blue-600 transition-colors"
-                            dangerouslySetInnerHTML={{ __html: post.title }}
+                            class="font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight hover:text-blue-600 transition-colors"
+                            set:html={post.title}
                           />
                         </a>
-                        <div className="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
+                        <div class="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
                           <p>
                             {getWordExcerpt(post.content || post.description, 50)}
                           </p>
                         </div>
 
                         {post.slug && (
-                          <div className="order-5 pt-1 md:pt-2">
+                          <div class="order-5 pt-1 md:pt-2">
                             <a
                               href={url(`/blog/${post.slug}`)}
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
+                              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
                               id={`btn-read-more-${post.id}`}
                             >
                               <span>Leer más</span>
-                              <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                              <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                             </a>
                           </div>
                         )}
@@ -337,12 +188,12 @@ export default function ProgramSections({
                       {post.image && (
                         <a 
                           href={post.slug ? url(`/blog/${post.slug}`) : '#'} 
-                          className="order-2 md:order-none block group/img cursor-pointer w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative"
+                          class="order-2 md:order-none block group/img cursor-pointer w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative"
                         >
                           <img
                             src={post.image}
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
                         </a>
@@ -353,14 +204,14 @@ export default function ProgramSections({
               ) : (
                 <>
                   {/* Introduction card */}
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
-                      <div className="contents md:flex md:flex-col md:gap-y-3">
-                        <span className="order-1 text-[10px] font-bold text-blue-600 uppercase tracking-widest block">Prácticas Universitarias</span>
-                        <h3 className="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
+                  <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+                      <div class="contents md:flex md:flex-col md:gap-y-3">
+                        <span class="order-1 text-[10px] font-bold text-blue-600 uppercase tracking-widest block">Prácticas Universitarias</span>
+                        <h3 class="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
                           Fortalece tu Vocación en el Territorio
                         </h3>
-                        <div className="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
+                        <div class="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
                           <p>
                             La organización está en la busqueda de personas idóneas, para que aporten sus conocimiemtos e ideas, con el fin de apoyar a quienes se encuentran bajo el mandato de protección de FUNDELIBERTAD.
                           </p>
@@ -370,21 +221,21 @@ export default function ProgramSections({
                           <p>
                             Animamos a participar a todas aquellas personas cualificadas, sin distinción de raza, color, sexo, nacionalidad, edad, religión y discapacidad.
                           </p>
-                          <div className="pt-3 border-t border-slate-100">
-                            <span className="font-bold text-[10px] uppercase tracking-wider text-slate-700 block mb-1">FINALIDAD</span>
-                            <p className="mb-2">Los objetivos son los siguientes:</p>
-                            <ul className="list-disc pl-4 space-y-1.5">
+                          <div class="pt-3 border-t border-slate-100">
+                            <span class="font-bold text-[10px] uppercase tracking-wider text-slate-700 block mb-1">FINALIDAD</span>
+                            <p class="mb-2">Los objetivos son los siguientes:</p>
+                            <ul class="list-disc pl-4 space-y-1.5">
                               <li>Principalmente, brindar la oportunidad de ganar experiencia laboral relacionada con sus estudios académicos o futuras oportunidades de trabajo en áreas vinculadas con el mandato de FUNDELIBERTAD.</li>
                               <li>En segundo lugar, permitir que FUNDELIBERTAD se beneficie de la labor de los pasantes.</li>
                             </ul>
                           </div>
                         </div>
                       </div>
-                      <div className="order-2 md:order-none w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative">
+                      <div class="order-2 md:order-none w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative">
                         <img
                           src="https://lh3.googleusercontent.com/d/1VOAa3Fwpv9QvlaDHN7PP8mWY-jYImtzN"
                           alt="Prácticas universitarias FUNDELIBERTAD"
-                          className="w-full h-full object-cover"
+                          class="w-full h-full object-cover"
                           loading="lazy"
                         />
                       </div>
@@ -392,33 +243,33 @@ export default function ProgramSections({
                   </div>
 
                   {/* Highlight Intern card */}
-                  <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
-                      <div className="contents md:flex md:flex-col md:gap-y-3">
-                        <span className="order-1 text-[10px] font-bold text-blue-600 uppercase tracking-widest block">Prácticas y Pasantías</span>
-                        <h3 className="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
+                  <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+                      <div class="contents md:flex md:flex-col md:gap-y-3">
+                        <span class="order-1 text-[10px] font-bold text-blue-600 uppercase tracking-widest block">Prácticas y Pasantías</span>
+                        <h3 class="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
                           Fabian Alejandro Areiza Valencia
                         </h3>
-                        <div className="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
+                        <div class="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
                           <p>
                             {getWordExcerpt("Fabian Alejandro Areiza Valencia, estudiante del Servicio Nacional de Aprendizaje-SENA en el programa de Tecnología en Contabilidad y Finanzas, realiza las pasantias en FUNDELIBERTAD desde el día 5 de abril de 2021 hasta el 20 de agosto de 2021, para poder recibir su grado.", 50)}
                           </p>
                         </div>
-                        <div className="order-5 pt-1 md:pt-2">
+                        <div class="order-5 pt-1 md:pt-2">
                           <a
                             href={url('/blog')}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
                           >
                             <span>Leer más</span>
-                            <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                            <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                           </a>
                         </div>
                       </div>
-                      <div className="order-2 md:order-none w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative">
+                      <div class="order-2 md:order-none w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative">
                         <img
                           src="https://lh3.googleusercontent.com/d/1EvbiisDrvz4JgZf3o388N7PeKMP5dxKP"
                           alt="Pasantías en Contabilidad y Finanzas - SENA"
-                          className="w-full h-full object-cover"
+                          class="w-full h-full object-cover"
                           loading="lazy"
                         />
                       </div>
@@ -428,90 +279,90 @@ export default function ProgramSections({
               )}
 
               {/* Informative Block instead of form */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 md:p-8 space-y-6">
-                <h4 className="font-display font-bold text-base text-slate-900 border-l-2 border-blue-600 pl-2.5">
+              <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 md:p-8 space-y-6">
+                <h4 class="font-display font-bold text-base text-slate-900 border-l-2 border-blue-600 pl-2.5">
                   ¿Cómo vincularte a nuestro programa de Prácticas y Pasantías?
                 </h4>
                 
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p class="text-xs text-slate-600 leading-relaxed">
                   Para iniciar tu proceso de prácticas profesionales o responsabilidad social con FUNDELIBERTAD, puedes comunicarte directamente con nuestro equipo de coordinación académica o enviar tus documentos institucionales. Estaremos encantados de acompañarte en tu formación:
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-5 bg-blue-50/50 rounded-xl border border-blue-100 space-y-2">
-                    <h5 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
-                      <Mail className="w-4.5 h-4.5 text-blue-600" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="p-5 bg-blue-50/50 rounded-xl border border-blue-100 space-y-2">
+                    <h5 class="font-bold text-xs text-blue-900 flex items-center gap-1.5">
+                      <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                       Envío de Documentos
                     </h5>
-                    <p className="text-[11px] text-slate-600 leading-normal">
+                    <p class="text-[11px] text-slate-600 leading-normal">
                       Remite tu hoja de vida, sábana de notas actualizada y carta de presentación de tu universidad a:
                     </p>
-                    <a href="mailto:info@fundelibertad.org" className="text-xs font-mono font-bold text-blue-700 hover:underline block pt-1">
+                    <a href="mailto:info@fundelibertad.org" class="text-xs font-mono font-bold text-blue-700 hover:underline block pt-1">
                       info@fundelibertad.org
                     </a>
                   </div>
 
-                  <div className="p-5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-2">
-                    <h5 className="font-bold text-xs text-emerald-900 flex items-center gap-1.5">
-                      <Phone className="w-4.5 h-4.5 text-emerald-600" />
+                  <div class="p-5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-2">
+                    <h5 class="font-bold text-xs text-emerald-900 flex items-center gap-1.5">
+                      <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                       Línea Directa de Coordinación
                     </h5>
-                    <p className="text-[11px] text-slate-600 leading-normal">
+                    <p class="text-[11px] text-slate-600 leading-normal">
                       Escríbenos directamente vía WhatsApp para solicitar información de convenios activos con tu universidad:
                     </p>
-                    <a href="https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20estoy%20interesado%20en%20el%20programa%20de%20pr%C3%A1cticas%20y%20pasant%C3%ADas." target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-700 hover:underline block pt-1">
+                    <a href="https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20estoy%20interesado%20en%20el%20programa%20de%20pr%C3%A1cticas%20y%20pasant%C3%ADas." target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-emerald-700 hover:underline block pt-1">
                       +57 300 216 7822
                     </a>
                   </div>
                 </div>
 
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* B. SECTION: REPORTS */}
           {activeTab === 'reports' && (
-            <motion.div
+            <div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 15 }}
-              className="space-y-8"
+              class="space-y-8"
               id="reports-panel"
               key="reports"
             >
               {/* Dynamic WordPress cards for "Informes y Denuncias de DDHH" */}
               {reportsPosts.length > 0 ? (
                 reportsPosts.map((post) => (
-                  <div key={post.id} className="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
-                      <div className={post.image ? "contents md:flex md:flex-col md:gap-y-3" : "contents md:flex md:flex-col md:gap-y-3 md:col-span-2"}>
-                        <span className="order-1 text-[10px] font-bold text-amber-700 uppercase tracking-widest block">
+                  <div key={post.id} class="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+                      <div class={post.image ? "contents md:flex md:flex-col md:gap-y-3" : "contents md:flex md:flex-col md:gap-y-3 md:col-span-2"}>
+                        <span class="order-1 text-[10px] font-bold text-amber-700 uppercase tracking-widest block">
                           {post.category || 'Informes y Denuncias de DDHH'}
                         </span>
                         <a 
                           href={post.slug ? url(`/blog/${post.slug}`) : '#'} 
-                          className="order-3 block hover:text-amber-800 transition-colors"
+                          class="order-3 block hover:text-amber-800 transition-colors"
                         >
                           <h3 
-                            className="font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight hover:text-amber-800 transition-colors"
-                            dangerouslySetInnerHTML={{ __html: post.title }}
+                            class="font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight hover:text-amber-800 transition-colors"
+                            set:html={post.title}
                           />
                         </a>
-                        <div className="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
+                        <div class="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
                           <p>
                             {getWordExcerpt(post.content || post.description, 50)}
                           </p>
                         </div>
 
                         {post.slug && (
-                          <div className="order-5 pt-1 md:pt-2">
+                          <div class="order-5 pt-1 md:pt-2">
                             <a
                               href={url(`/blog/${post.slug}`)}
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
+                              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
                               id={`btn-read-more-${post.id}`}
                             >
                               <span>Leer más</span>
-                              <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                              <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                             </a>
                           </div>
                         )}
@@ -520,12 +371,12 @@ export default function ProgramSections({
                       {post.image && (
                         <a 
                           href={post.slug ? url(`/blog/${post.slug}`) : '#'} 
-                          className="order-2 md:order-none block group/img cursor-pointer w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative"
+                          class="order-2 md:order-none block group/img cursor-pointer w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative"
                         >
                           <img
                             src={post.image}
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
                         </a>
@@ -562,13 +413,13 @@ export default function ProgramSections({
                 const isCaso25 = index === 24;
                 const isCaso26 = index === 25;
                 return (
-                  <div key={index} className="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8" id={`denuncia-card-${index}`}>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-start">
-                      <div className="contents lg:flex lg:flex-col lg:col-span-2 lg:gap-y-3">
-                        <div className="order-1 flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">Canal de Derechos Humanos</span>
+                  <div key={index} class="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8" id={`denuncia-card-${index}`}>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-start">
+                      <div class="contents lg:flex lg:flex-col lg:col-span-2 lg:gap-y-3">
+                        <div class="order-1 flex items-center gap-2">
+                          <span class="text-[10px] font-bold text-amber-700 uppercase tracking-widest block">Canal de Derechos Humanos</span>
                         </div>
-                        <h3 className="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
+                        <h3 class="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
                           {isCaso2 
                             ? 'VIOLACIÓN A LA SEGURIDAD SOCIAL, SALUD Y LA VIDA' 
                             : isCaso3 
@@ -622,10 +473,10 @@ export default function ProgramSections({
                             : 'Denuncias'}
                         </h3>
                         
-                        <div className="order-4 text-xs text-slate-500 space-y-3.5 leading-relaxed">
+                        <div class="order-4 text-xs text-slate-500 space-y-3.5 leading-relaxed">
                           {isCaso2 ? (
                             <>
-                              <p className="font-semibold text-slate-700">
+                              <p class="font-semibold text-slate-700">
                                 El sufrimiento que tienen que padecer los usuarios de las EPS; en especial en este caso la NUEVA EPS:
                               </p>
                               <p>
@@ -667,7 +518,7 @@ export default function ProgramSections({
                               <p>
                                 En el expediente citado reposa la queja disciplinaria, la que remite a una prueba documental -procesos tramitados en el despacho de la funcionaria denunciada- que es sumamente clara y que tan solo exige proceder a una lectura y estudio de los mismos, para luego emitir las decisiones que en derecho correspondan, lo que, no demanda demasiado tiempo. Por lo que, es lógico formularse el siguiente interrogante:
                               </p>
-                              <p className="font-semibold text-slate-700">
+                              <p class="font-semibold text-slate-700">
                                 ¿Sí la funcionaria, abogada Luz María Mena Flórez, conoce de antemano que la queja disciplinaria se cimenta en una prueba documental, cómo es posible que, al día de hoy, en más de 17 meses que tiene a su cargo el correspondiente proceso, solo haya proferido un auto, esto es, el de indagación preliminar?
                               </p>
                               <p>
@@ -727,7 +578,7 @@ export default function ProgramSections({
                               <p>
                                 Para lograr esto, es necesario que la Justicia sea un valor inculcado por la familia, reforzado por las instituciones educativas, respetado y amparado por el Estado y sus instituciones, y puesto en práctica por la sociedad.
                               </p>
-                              <p className="font-bold text-slate-800">
+                              <p class="font-bold text-slate-800">
                                 ¿Ahora, será que, en nuestro país realmente existe la Justicia?
                               </p>
                               <p>
@@ -864,8 +715,8 @@ export default function ProgramSections({
                                 Es de conocimiento general, que una de las herramientas con las que cuenta la ciudadanía en general, para dar a conocer determinada problemática que afecte a sus comunidades, lo es, la denuncia, bien sea particular o pública. Por ello, FUNDELIBERTAD en pro de los derechos fundamentales, de los derechos sociales, económicos y culturales, y de los derechos colectivos y del ambiente, decepcionará de cualquier fuente, para proceder a efectuar la correspondiente denuncia pública, los hechos o los actos que atenten contra ellos.
                               </p>
 
-                              <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl space-y-2 text-amber-950 font-medium">
-                                <p className="font-bold uppercase tracking-wider text-[10px] text-amber-800">
+                              <div class="p-4 bg-amber-50 border border-amber-100 rounded-xl space-y-2 text-amber-950 font-medium">
+                                <p class="font-bold uppercase tracking-wider text-[10px] text-amber-800">
                                   ¡ A LA ESPERA DE UNA DECISIÒN ADMINISTRATIVA CONFORME A DERECHO ¡
                                 </p>
                                 <p>
@@ -885,11 +736,11 @@ export default function ProgramSections({
                                 Posteriormente, la abogada Mena Flórez fue trasladada a otra sección, razón por la cual, el expediente fue asignado al abogado Jorge Iván Martínez Carvajal, quien en el mes de mayo del corriente año, procedió, luego de dictar apertura formal de investigación disciplinaria, a citar al quejoso para que rindiera declaración juramentada sobre los hechos denunciados. Diligencia, a la que compareció el pasado 7 de junio de este año.
                               </p>
 
-                              <p className="font-bold text-slate-800 pt-1">
+                              <p class="font-bold text-slate-800 pt-1">
                                 A esta altura procesal es importante traer a colación dos aspectos fundamentales, a saber:
                               </p>
 
-                              <ul className="list-disc pl-5 space-y-2 text-slate-500">
+                              <ul class="list-disc pl-5 space-y-2 text-slate-500">
                                 <li>
                                   <strong>En primer lugar</strong>, la queja disciplinaria, sobre la cual se cimenta la correspondiente actuación, se remite a una prueba documental -procesos tramitados en el despacho de la funcionaria denunciada- que es sumamente clara y que tan solo exige proceder a una lectura y estudio de los mismos, para luego emitir las decisiones que en derecho correspondan, lo que, no demanda demasiado tiempo.
                                 </li>
@@ -906,7 +757,7 @@ export default function ProgramSections({
                                 En el proceso en comento, mientras el expediente estuvo a cargo de la abogada Mena Flórez, se presentaron muchas dilaciones. Situación que cambió, when el mismo fue asignado al conocimiento de otro funcionario.
                               </p>
 
-                              <p className="font-medium text-slate-800">
+                              <p class="font-medium text-slate-800">
                                 Por ello, se espera que el trámite disciplinario continue por sus cauces legales, y se dicte, una vez agotadas todas las etapas pertinentes, la decisión de fondo que en derecho corresponda, evitando que opere la prescripción de la acción disciplinaria.
                               </p>
                             </>
@@ -1029,96 +880,96 @@ export default function ProgramSections({
               }))}
 
               {/* Informative Block instead of form */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 md:p-8 space-y-6">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-display font-bold text-base text-slate-900 border-l-2 border-amber-600 pl-2.5">
+              <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 md:p-8 space-y-6">
+                <div class="flex items-center justify-between">
+                  <h4 class="font-display font-bold text-base text-slate-900 border-l-2 border-amber-600 pl-2.5">
                     ¿Cómo denunciar o reportar vulneraciones de DDHH?
                   </h4>
-                  <div className="flex items-center gap-1.5 bg-slate-100 px-3 py-1 rounded-full text-[10px] font-mono text-slate-500">
-                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                  <div class="flex items-center gap-1.5 bg-slate-100 px-3 py-1 rounded-full text-[10px] font-mono text-slate-500">
+                    <svg class="w-3.5 h-3.5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <span>Línea Confidencial</span>
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p class="text-xs text-slate-600 leading-relaxed">
                   En FUNDELIBERTAD protegemos tu voz y tu seguridad. Si has sido testigo o víctima de alguna vulneración de tus derechos fundamentales, abuso de autoridad, discriminación extrema o amenazas, puedes denunciarlo de forma totalmente confidencial y segura a través de los siguientes canales:
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-5 bg-amber-50/50 rounded-xl border border-amber-100 space-y-2">
-                    <h5 className="font-bold text-xs text-amber-950 flex items-center gap-1.5">
-                      <Mail className="w-4.5 h-4.5 text-amber-600" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="p-5 bg-amber-50/50 rounded-xl border border-amber-100 space-y-2">
+                    <h5 class="font-bold text-xs text-amber-950 flex items-center gap-1.5">
+                      <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                       Reporte por Correo Seguro
                     </h5>
-                    <p className="text-[11px] text-amber-800 leading-normal">
+                    <p class="text-[11px] text-amber-800 leading-normal">
                       Remite los hechos, evidencias físicas o testimonios de manera anónima o identificada al correo institucional de reserva:
                     </p>
-                    <a href="mailto:info@fundelibertad.org" className="text-xs font-mono font-bold text-amber-900 hover:underline block pt-1">
+                    <a href="mailto:info@fundelibertad.org" class="text-xs font-mono font-bold text-amber-900 hover:underline block pt-1">
                       info@fundelibertad.org
                     </a>
                   </div>
 
-                  <div className="p-5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-2">
-                    <h5 className="font-bold text-xs text-emerald-900 flex items-center gap-1.5">
-                      <Phone className="w-4.5 h-4.5 text-emerald-600" />
+                  <div class="p-5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-2">
+                    <h5 class="font-bold text-xs text-emerald-900 flex items-center gap-1.5">
+                      <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                       Atención Urgente WhatsApp
                     </h5>
-                    <p className="text-[11px] text-slate-600 leading-normal">
+                    <p class="text-[11px] text-slate-600 leading-normal">
                       Comunícate directamente con nuestros defensores seniors para agendar una cita virtual o física bajo estricta reserva profesional:
                     </p>
-                    <a href="https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20necesito%20radicar%20una%20denuncia%20o%20informe%20de%20vulneraci%C3%B3n%20de%20DDHH." target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-700 hover:underline block pt-1">
+                    <a href="https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20necesito%20radicar%20una%20denuncia%20o%20informe%20de%20vulneraci%C3%B3n%20de%20DDHH." target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-emerald-700 hover:underline block pt-1">
                       +57 300 216 7822
                     </a>
                   </div>
                 </div>
 
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* C. SECTION: LEGAL ADVISORY */}
           {activeTab === 'legal' && (
-            <motion.div
+            <div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 15 }}
-              className="space-y-8"
+              class="space-y-8"
               id="legal-panel"
               key="legal"
             >
               {/* Dynamic WordPress cards for "Asesoría Jurídica Gratuita" */}
               {legalPosts.length > 0 ? (
                 legalPosts.map((post) => (
-                  <div key={post.id} className="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
-                      <div className={post.image ? "contents md:flex md:flex-col md:gap-y-3" : "contents md:flex md:flex-col md:gap-y-3 md:col-span-2"}>
-                        <span className="order-1 text-[10px] font-bold text-emerald-700 uppercase tracking-widest block">
+                  <div key={post.id} class="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 items-start">
+                      <div class={post.image ? "contents md:flex md:flex-col md:gap-y-3" : "contents md:flex md:flex-col md:gap-y-3 md:col-span-2"}>
+                        <span class="order-1 text-[10px] font-bold text-emerald-700 uppercase tracking-widest block">
                           {post.category || 'Asesoría Jurídica Gratuita'}
                         </span>
                         <a 
                           href={post.slug ? url(`/blog/${post.slug}`) : '#'} 
-                          className="order-3 block hover:text-emerald-800 transition-colors"
+                          class="order-3 block hover:text-emerald-800 transition-colors"
                         >
                           <h3 
-                            className="font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight hover:text-emerald-800 transition-colors"
-                            dangerouslySetInnerHTML={{ __html: post.title }}
+                            class="font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight hover:text-emerald-800 transition-colors"
+                            set:html={post.title}
                           />
                         </a>
-                        <div className="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
+                        <div class="order-4 text-xs text-slate-500 space-y-3 leading-relaxed">
                           <p>
                             {getWordExcerpt(post.content || post.description, 50)}
                           </p>
                         </div>
 
                         {post.slug && (
-                          <div className="order-5 pt-1 md:pt-2">
+                          <div class="order-5 pt-1 md:pt-2">
                             <a
                               href={url(`/blog/${post.slug}`)}
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
+                              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
                               id={`btn-read-more-${post.id}`}
                             >
                               <span>Leer más</span>
-                              <ChevronRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                              <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                             </a>
                           </div>
                         )}
@@ -1127,12 +978,12 @@ export default function ProgramSections({
                       {post.image && (
                         <a 
                           href={post.slug ? url(`/blog/${post.slug}`) : '#'} 
-                          className="order-2 md:order-none block group/img cursor-pointer w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative"
+                          class="order-2 md:order-none block group/img cursor-pointer w-full h-56 sm:h-64 md:h-full min-h-[220px] md:min-h-[250px] rounded-xl overflow-hidden bg-slate-100 border border-slate-200/80 relative"
                         >
                           <img
                             src={post.image}
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
+                            class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
                         </a>
@@ -1258,16 +1109,16 @@ export default function ProgramSections({
                 }
 
                 return (
-                  <div key={originalIndex} className="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-start">
-                      <div className="contents lg:flex lg:flex-col lg:col-span-2 lg:gap-y-3">
-                        <span className="order-1 text-[10px] font-bold text-emerald-700 uppercase tracking-widest block">
+                  <div key={originalIndex} class="bg-white rounded-2xl border border-slate-100 shadow-xs p-5 sm:p-6 md:p-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6 items-start">
+                      <div class="contents lg:flex lg:flex-col lg:col-span-2 lg:gap-y-3">
+                        <span class="order-1 text-[10px] font-bold text-emerald-700 uppercase tracking-widest block">
                           Asesoría Jurídica Gratuita
                         </span>
-                        <h3 className="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
+                        <h3 class="order-3 font-display font-black text-xl md:text-2xl text-slate-900 tracking-tight leading-tight">
                           {title}
                         </h3>
-                        <p className="order-4 text-xs text-slate-500 leading-relaxed">
+                        <p class="order-4 text-xs text-slate-500 leading-relaxed">
                           {description}
                         </p>
                       </div>
@@ -1283,38 +1134,38 @@ export default function ProgramSections({
               }))}
 
               {/* Informative Block instead of form */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 md:p-8 space-y-6">
-                <h4 className="font-display font-bold text-base text-slate-900 border-l-2 border-emerald-600 pl-2.5">
+              <div class="bg-white rounded-2xl border border-slate-100 shadow-xs p-6 md:p-8 space-y-6">
+                <h4 class="font-display font-bold text-base text-slate-900 border-l-2 border-emerald-600 pl-2.5">
                   ¿Cómo solicitar una Asesoría Jurídica Gratuita?
                 </h4>
 
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p class="text-xs text-slate-600 leading-relaxed">
                   Si necesitas asesoramiento en Derecho Constitucional (tutelas y derechos de petición), Derecho de Familia, Laboral, Civil o apoyo psicosocial, nuestro equipo de consultorio jurídico comunitario está listo para orientarte sin ningún costo:
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-2">
-                    <h5 className="font-bold text-xs text-emerald-900 flex items-center gap-1.5">
-                      <Phone className="w-4.5 h-4.5 text-emerald-600" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div class="p-5 bg-emerald-50/50 rounded-xl border border-emerald-100 space-y-2">
+                    <h5 class="font-bold text-xs text-emerald-900 flex items-center gap-1.5">
+                      <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                       Consulta por WhatsApp
                     </h5>
-                    <p className="text-[11px] text-slate-600 leading-normal">
+                    <p class="text-[11px] text-slate-600 leading-normal">
                       La forma más rápida de recibir asesoría. Describe brevemente tu caso para asignarte un abogado comunitario:
                     </p>
-                    <a href="https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20necesito%20solicitar%20una%20asesor%C3%ADa%20jur%C3%ADdica%20gratuita." target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-emerald-700 hover:underline block pt-1">
+                    <a href="https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20necesito%20solicitar%20una%20asesor%C3%ADa%20jur%C3%ADdica%20gratuita." target="_blank" rel="noopener noreferrer" class="text-xs font-bold text-emerald-700 hover:underline block pt-1">
                       +57 300 216 7822
                     </a>
                   </div>
 
-                  <div className="p-5 bg-blue-50/50 rounded-xl border border-blue-100 space-y-2">
-                    <h5 className="font-bold text-xs text-blue-900 flex items-center gap-1.5">
-                      <Mail className="w-4.5 h-4.5 text-blue-600" />
+                  <div class="p-5 bg-blue-50/50 rounded-xl border border-blue-100 space-y-2">
+                    <h5 class="font-bold text-xs text-blue-900 flex items-center gap-1.5">
+                      <svg class="w-4.5 h-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                       Correo Electrónico
                     </h5>
-                    <p className="text-[11px] text-slate-600 leading-normal">
+                    <p class="text-[11px] text-slate-600 leading-normal">
                       Envía copias de tus documentos, notificaciones recibidas o expedientes para un análisis técnico formal:
                     </p>
-                    <a href="mailto:info@fundelibertad.org" className="text-xs font-mono font-bold text-blue-700 hover:underline block pt-1">
+                    <a href="mailto:info@fundelibertad.org" class="text-xs font-mono font-bold text-blue-700 hover:underline block pt-1">
                       info@fundelibertad.org
                     </a>
                   </div>
@@ -1322,10 +1173,8 @@ export default function ProgramSections({
 
 
               </div>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        
       </div>
     </div>
-  );
-}

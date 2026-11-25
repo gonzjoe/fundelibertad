@@ -1,0 +1,293 @@
+---
+/**
+ * ContactSection nativo en Astro con formulario y mapa vectorial interactivo (0 KB React).
+ * Idéntico en campos, estética, tarjeta de WhatsApp, correo, sede y coordenadas.
+ */
+---
+
+<div class="space-y-12 pb-16 font-sans text-left" id="contact-section-container">
+  {/* Header Intro */}
+  <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-xs space-y-4">
+    <span class="text-xs font-bold text-sky-800 uppercase tracking-widest block">Atención al Ciudadano</span>
+    <h1 class="font-display font-black text-3xl sm:text-4xl text-brand-dark tracking-tight leading-none">
+      Contáctanos o Visítanos en Guayabal
+    </h1>
+    <div class="w-16 h-1 bg-brand-green rounded-full"></div>
+    <p class="text-sm text-slate-600 max-w-3xl leading-relaxed">
+      Nuestra sede comunitaria está disponible para atender solicitudes jurídicas, quejas de derechos humanos y convenios universitarios. También puedes enviarnos tu consulta directa a través del siguiente formulario institucional.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    {/* Form: 7 Cols */}
+    <div class="lg:col-span-7 bg-white rounded-3xl border border-slate-100 p-8 shadow-xs">
+      <div class="space-y-2 mb-6">
+        <h3 class="font-display font-bold text-xl text-slate-900 tracking-tight">Radicar Consulta / Mensaje</h3>
+        <p class="text-xs text-slate-500 leading-normal">
+          Diligencia tus datos. Te responderemos formalmente en un plazo no mayor a 24 horas hábiles.
+        </p>
+      </div>
+
+      <form id="contact-native-form" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Nombre Completo *</label>
+            <input
+              id="contact-name-input"
+              type="text"
+              required
+              placeholder="Ej: Laura Restrepo"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500 text-xs"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Correo Electrónico *</label>
+            <input
+              id="contact-email-input"
+              type="email"
+              required
+              placeholder="tu@correo.com"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500 text-xs"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Asunto de la Consulta</label>
+          <input
+            id="contact-subject-input"
+            type="text"
+            placeholder="Ej: Deseo ser voluntario / Información sobre donaciones"
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500 text-xs"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Mensaje *</label>
+          <textarea
+            id="contact-message-textarea"
+            required
+            rows="5"
+            placeholder="Escribe aquí tu mensaje institucional detalladamente..."
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500 text-xs font-sans leading-relaxed"
+          ></textarea>
+        </div>
+
+        <button
+          id="submit-contact-btn"
+          type="submit"
+          class="w-full py-3.5 bg-brand-primary hover:bg-blue-800 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span id="submit-btn-text">Enviar Mensaje de Contacto</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </button>
+      </form>
+
+      {/* Success Notification */}
+      <div id="contact-success-state" class="hidden bg-emerald-50/50 p-6 rounded-2xl border border-emerald-100 text-center space-y-4">
+        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-brand-green mx-auto border border-emerald-100">
+          <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="space-y-1.5">
+          <h4 class="font-display font-bold text-lg text-emerald-900">¡Mensaje Enviado Exitosamente!</h4>
+          <p class="text-xs text-slate-600 max-w-md mx-auto leading-relaxed" id="contact-success-msg">
+            Gracias. Tu consulta ha sido radicada correctamente. Un voluntario te responderá al correo provisto en breve.
+          </p>
+        </div>
+        <button
+          id="reset-contact-btn"
+          type="button"
+          class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl text-xs font-bold text-slate-600 transition-colors cursor-pointer"
+        >
+          Enviar Otro Mensaje
+        </button>
+      </div>
+    </div>
+
+    {/* Info Cards: 5 Cols */}
+    <div class="lg:col-span-5 space-y-6">
+      {/* Card 1: WhatsApp */}
+      <div class="bg-gradient-to-br from-emerald-50 to-white rounded-2xl border border-emerald-100 p-6 flex items-start gap-4 shadow-xs">
+        <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 fill-white text-white" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1zM19 12h2c0-4.97-4.03-9-9-9v2c3.87 0 7 3.13 7 7zm-4 0h2c0-2.76-2.24-5-5-5v2c1.66 0 3 1.34 3 3z"/>
+          </svg>
+        </div>
+        <div class="space-y-1">
+          <span class="text-[9px] font-black uppercase bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full border border-emerald-200">En línea</span>
+          <h4 class="font-display font-bold text-sm text-slate-900">Contacto Directo WhatsApp</h4>
+          <p class="text-xs text-slate-500 leading-normal mb-2.5">Recibe asesoría o respuestas rápidas en tu teléfono.</p>
+          <a
+            id="contact-whatsapp-btn"
+            href="https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20me%20gustar%C3%ADa%20recibir%20m%C3%A1s%20informaci%C3%B3n%20o%20solicitar%20asesor%C3%ADa."
+            target="_blank"
+            rel="noopener noreferrer"
+            class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition-colors cursor-pointer inline-flex items-center gap-1 shadow-sm"
+          >
+            Chatear +57 300 216 7822
+          </a>
+        </div>
+      </div>
+
+      {/* Card 2: Email */}
+      <div class="bg-white rounded-2xl border border-slate-100 p-6 flex items-start gap-4 shadow-xs">
+        <div class="w-11 h-11 rounded-xl bg-blue-50 text-brand-primary flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div class="space-y-1">
+          <h4 class="font-display font-bold text-sm text-slate-900">Correo Institucional</h4>
+          <p class="text-xs text-slate-500 leading-normal">Escríbenos para convenios universitarios o informes gubernamentales.</p>
+          <a href="mailto:info@fundelibertad.org" class="text-xs font-mono font-bold text-brand-primary hover:underline block pt-1.5">
+            info@fundelibertad.org
+          </a>
+        </div>
+      </div>
+
+      {/* Card 3: Address & Hours */}
+      <div class="bg-white rounded-2xl border border-slate-100 p-6 flex items-start gap-4 shadow-xs">
+        <div class="w-11 h-11 rounded-xl bg-slate-50 text-slate-700 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-slate-700 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <div class="space-y-1">
+          <h4 class="font-display font-bold text-sm text-slate-900">Sede Principal Guayabal</h4>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Calle 1A #55-39, Barrio El Rodeo<br />
+            Comuna 15 Guayabal, Medellín, Colombia
+          </p>
+          <div class="pt-2 flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span>Lunes a Viernes: 8:00 AM - 5:00 PM</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {/* Styled Interactive Vector Map Component */}
+  <section class="space-y-4" id="map-section">
+    <div class="flex items-center gap-2">
+      <svg class="w-6 h-6 text-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+      </svg>
+      <h3 class="font-display font-bold text-lg text-brand-dark uppercase tracking-wide">Ubicación de la Sede en Guayabal</h3>
+    </div>
+
+    {/* Vector Map Wrapper */}
+    <div class="relative rounded-3xl bg-slate-950 border border-slate-800 text-white p-6 md:p-8 overflow-hidden shadow-xl min-h-[350px] flex flex-col justify-between">
+      <div class="absolute inset-0 opacity-15 bg-[linear-gradient(rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full border border-sky-500/20 animate-pulse pointer-events-none"></div>
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full border border-sky-500/10 pointer-events-none"></div>
+
+      {/* Map metadata labels */}
+      <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900/95 backdrop-blur-md p-4 rounded-2xl border border-slate-800">
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-brand-green animate-ping"></span>
+            <span class="font-display font-bold text-sm text-white">Sede FUNDELIBERTAD Medellín</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Calle 1A #55-39 - Medellin - Colombia</p>
+        </div>
+        
+        <a
+          id="google-maps-navigation-link"
+          href="https://www.google.com/maps/search/?api=1&query=Calle+1A+%2355-39,+Medellin,+Colombia"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer shadow-md"
+        >
+          <span>Cómo llegar (Google Maps)</span>
+          <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </a>
+      </div>
+
+      {/* Map Vector Mock Coordinates */}
+      <div class="relative z-10 flex flex-col items-center justify-center py-10 space-y-3">
+        <div class="w-14 h-14 rounded-full bg-brand-green/30 flex items-center justify-center animate-bounce text-white shadow-lg border border-brand-green">
+          <svg class="w-7 h-7 text-white fill-brand-green" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        
+        <div class="text-center space-y-1 bg-slate-900/90 p-4 rounded-xl border border-slate-800/80 max-w-xs backdrop-blur-xs shadow-md">
+          <span class="text-[9px] font-mono font-bold text-sky-400 block uppercase tracking-widest">Coordenadas de Acceso</span>
+          <p class="font-mono text-xs font-bold text-white">6.2162° N, 75.5925° W</p>
+          <p class="text-[10px] text-slate-400 leading-normal pt-1 border-t border-slate-800 mt-1">A tres cuadras de la Avenida Guayabal, sector El Rodeo.</p>
+        </div>
+      </div>
+
+      {/* Compass grid coordinates */}
+      <div class="relative z-10 flex items-center justify-between text-[10px] font-mono text-slate-500">
+        <span>Zona Sur-Occidental Medellín</span>
+        <span>Estación Aguacatala (Ruta Alimentadora C15)</span>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script is:inline>
+  (function() {
+    const form = document.getElementById('contact-native-form');
+    const successBox = document.getElementById('contact-success-state');
+    const successMsg = document.getElementById('contact-success-msg');
+    const resetBtn = document.getElementById('reset-contact-btn');
+    const submitBtn = document.getElementById('submit-contact-btn');
+    const submitText = document.getElementById('submit-btn-text');
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('contact-name-input').value.trim();
+      const email = document.getElementById('contact-email-input').value.trim();
+      const subject = document.getElementById('contact-subject-input').value.trim() || 'Consulta General';
+      const message = document.getElementById('contact-message-textarea').value.trim();
+
+      if (!name || !email || !message) return;
+
+      submitBtn.disabled = true;
+      submitText.textContent = 'Enviando Mensaje...';
+
+      setTimeout(() => {
+        const newMsg = {
+          id: 'MSG-' + Math.floor(Math.random() * 100000),
+          name,
+          email,
+          subject,
+          message,
+          date: new Date().toISOString().split('T')[0]
+        };
+
+        const existing = localStorage.getItem('fundelibertad_contacts');
+        const list = existing ? JSON.parse(existing) : [];
+        list.unshift(newMsg);
+        localStorage.setItem('fundelibertad_contacts', JSON.stringify(list));
+
+        form.classList.add('hidden');
+        successBox.classList.remove('hidden');
+        successMsg.textContent = `Gracias, ${name}. Tu consulta sobre "${subject}" ha sido radicada correctamente. Te responderemos al correo provisto en breve.`;
+        submitBtn.disabled = false;
+        submitText.textContent = 'Enviar Mensaje de Contacto';
+      }, 700);
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      form.reset();
+      successBox.classList.add('hidden');
+      form.classList.remove('hidden');
+    });
+  })();
+</script>

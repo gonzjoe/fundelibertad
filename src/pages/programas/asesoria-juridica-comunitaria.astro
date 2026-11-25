@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import ProgramSections from '../../components/sections/ProgramSections';
+import ProgramSections from '../../components/sections/ProgramSections.astro';
 import { getPosts, getFeaturedImageUrl, getPostCategories, hasValidCategory } from '../../lib/wordpress';
 import type { WPActivityItem } from '../../components/sections/ActivitiesSection';
 
@@ -51,7 +51,6 @@ const initialLegalPosts: WPActivityItem[] = legalRawPosts.map(post => {
   description="Solicitud en línea de orientación legal gratuita para personas y familias de escasos recursos."
 >
   <ProgramSections 
-    client:idle 
     initialSubsection="legal" 
     initialLegalPosts={initialLegalPosts} 
   />

@@ -1,13 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import HomeSection from '../components/sections/HomeSection';
+import HomeSection from '../components/sections/HomeSection.astro';
 ---
 
 <Layout
   title="Donar a FUNDELIBERTAD | Canal Oficial de Donaciones"
   description="Canal oficial para realizar aportes y donaciones a la Fundación de Derechos Humanos por la Libertad y la Vida."
 >
-  <HomeSection client:idle />
+  <HomeSection />
 </Layout>
 
 <script is:inline>

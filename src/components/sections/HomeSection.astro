@@ -1,0 +1,515 @@
+---
+import { IMPACT_STATS, TESTIMONIALS } from '../../data';
+import pasantiasImageSrc from '../../assets/images/pasantias_students_1782495066851.jpg';
+import denunciasImageSrc from '../../assets/images/denuncias_documento_handover_1782495219494.jpg';
+import asesoriasImageSrc from '../../assets/images/asesorias_legales_consultation_1782495362476.jpg';
+import type { WPActivityItem } from './ActivitiesSection.astro';
+import { url } from '../../lib/base';
+
+interface Props {
+  initialProjects?: WPActivityItem[];
+}
+
+const { initialProjects = [] } = Astro.props;
+
+const getWordExcerpt = (textOrHtml: string, maxWords: number = 50): string => {
+  if (!textOrHtml) return '';
+  const plain = textOrHtml
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  const words = plain.split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) return plain;
+  return words.slice(0, maxWords).join(' ') + '...';
+};
+---
+
+<div class="space-y-24 pb-16" id="home-section-container">
+  {/* 1. HERO SECTION */}
+  <section class="relative overflow-hidden rounded-3xl bg-[#3B82C1] text-white min-h-[550px] flex items-center shadow-xl border border-[#3B82C1]/20" id="hero-banner">
+    {/* Background Image with elegant overlay */}
+    <div class="absolute inset-0 z-0">
+      <img
+        src="https://lh3.googleusercontent.com/d/1mzMGHUgDdHcX8hpf8DTMLIs2Dv53CCsd"
+        alt="FUNDELIBERTAD Paz y Derechos Humanos en Colombia"
+        class="w-full h-full object-cover object-center opacity-65 scale-102"
+        referrerpolicy="no-referrer"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#14324f]/90 via-[#3B82C1]/60 to-[#14324f]/30"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#14324f]/70 via-transparent to-[#14324f]/20"></div>
+    </div>
+
+    {/* Hero content */}
+    <div class="relative z-10 max-w-4xl mx-auto px-6 sm:px-12 py-16 md:py-24 text-left space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/35 w-fit">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>15+ Años de Impacto en Medellín</span>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <h1 class="font-serif font-black text-3xl sm:text-6xl md:text-7xl tracking-tight leading-tight sm:leading-none text-white drop-shadow-sm">
+          FUNDELIBERTAD
+        </h1>
+        
+        <p class="font-display font-bold text-sm sm:text-xl md:text-2xl text-emerald-300 tracking-wide leading-snug">
+          Fundación de Derechos Humanos por la Libertad y la Vida
+        </p>
+      </div>
+
+      <p class="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+        Trabajamos por el bienestar y mejor calidad de vida de nuestra sociedad. Defendemos la dignidad, promovemos la reconciliación y brindamos herramientas de empoderamiento a las comunidades vulnerables de la Comuna 15 Guayabal.
+      </p>
+
+      {/* Action buttons */}
+      <div class="flex flex-wrap items-center gap-3.5 pt-4" id="hero-actions">
+        <button
+          id="hero-donate-btn"
+          type="button"
+          class="px-6 py-3.5 bg-brand-red hover:bg-red-700 text-white font-extrabold rounded-xl shadow-lg shadow-red-950/50 hover:shadow-red-500/30 transition-all flex items-center gap-2 cursor-pointer text-sm"
+        >
+          <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+          </svg>
+          Donar Ahora
+        </button>
+      </div>
+    </div>
+  </section>
+
+  {/* 2. STATS SECTION */}
+  <section class="space-y-8" id="stats-section">
+    <div class="text-center space-y-2">
+      <span class="text-xs font-bold text-sky-800 uppercase tracking-widest block">Nuestras Cifras</span>
+      <h2 class="font-display font-black text-2xl sm:text-4xl text-brand-dark tracking-tight">
+        Impacto Real de Corazón Comunitario
+      </h2>
+      <div class="w-16 h-1 bg-brand-green mx-auto rounded-full"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {IMPACT_STATS.map((stat) => (
+        <div
+          id={`stat-card-${stat.id}`}
+          class="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs space-y-4 hover:shadow-md transition-shadow group text-left"
+        >
+          <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+            {stat.iconName === 'Calendar' && (
+              <svg class="w-8 h-8 text-sky-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+              </svg>
+            )}
+            {stat.iconName === 'ShieldAlert' && (
+              <svg class="w-8 h-8 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="M12 8v4"/><path d="M12 16h.01"/>
+              </svg>
+            )}
+            {stat.iconName === 'Users' && (
+              <svg class="w-8 h-8 text-indigo-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            )}
+            {stat.iconName === 'UserCheck' && (
+              <svg class="w-8 h-8 text-brand-red" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+                <path d="M7 21h10"/>
+                <path d="M12 3v18"/>
+                <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>
+              </svg>
+            )}
+          </div>
+          <div class="space-y-1">
+            <p class="font-display font-black text-3xl text-brand-dark">{stat.value}</p>
+            <p class="font-bold text-xs text-slate-800 uppercase tracking-wider">{stat.label}</p>
+            <p class="text-xs text-slate-500 leading-relaxed">{stat.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* 3. FEATURED PROGRAMS PREVIEW */}
+  <section class="space-y-8" id="featured-programs">
+    <div class="text-center space-y-2">
+      <span class="text-xs font-bold text-sky-800 uppercase tracking-widest block">Nuestros Programas</span>
+      <h2 class="font-display font-black text-2xl sm:text-4xl text-brand-dark tracking-tight">
+        Programas Humanitarios de Impacto
+      </h2>
+      <div class="w-16 h-1 bg-brand-green mx-auto rounded-full"></div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Program 1: Pasantías y Prácticas */}
+      <a
+        id="program-card-internships"
+        href={url('/programas/practicas-pasantias')}
+        class="bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden text-left flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer group"
+      >
+        <div>
+          <div class="w-full h-48 sm:h-56 relative overflow-hidden bg-slate-100 border-b border-slate-100">
+            <img
+              src={typeof pasantiasImageSrc === 'string' ? pasantiasImageSrc : (pasantiasImageSrc as any)?.src || pasantiasImageSrc}
+              alt="Pasantías y Prácticas"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <span class="absolute top-3 left-3 bg-brand-green text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider z-20 shadow-xs">
+              Educación y Liderazgo
+            </span>
+          </div>
+          <div class="p-6 space-y-2">
+            <h3 class="font-display font-bold text-lg text-slate-950 leading-tight group-hover:text-sky-700 transition-colors">
+              Pasantías y Prácticas
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Convenio de formación y prácticas profesionales para estudiantes de bachillerato y universitarios con un impacto transformador.
+            </p>
+          </div>
+        </div>
+        <div class="p-6 pt-0">
+          <span class="text-xs text-brand-green font-semibold inline-flex items-center gap-1 group">
+            Saber más
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
+        </div>
+      </a>
+
+      {/* Program 2: Denuncias Ciudadanas */}
+      <a
+        id="program-card-reports"
+        href={url('/programas/informes-denuncias-ddhh')}
+        class="bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden text-left flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer group"
+      >
+        <div>
+          <div class="w-full h-48 sm:h-56 relative overflow-hidden bg-slate-100 border-b border-slate-100">
+            <img
+              src={typeof denunciasImageSrc === 'string' ? denunciasImageSrc : (denunciasImageSrc as any)?.src || denunciasImageSrc}
+              alt="Denuncias Ciudadanas"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <span class="absolute top-3 left-3 bg-amber-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider z-20 shadow-xs">
+              Derechos Humanos
+            </span>
+          </div>
+          <div class="p-6 space-y-2">
+            <h3 class="font-display font-bold text-lg text-slate-950 leading-tight group-hover:text-amber-700 transition-colors">
+              Denuncias Ciudadanas
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Canal de radicación confidencial y seguro para alertar sobre presuntas vulneraciones a los derechos fundamentales y recibir acompañamiento ético y jurídico.
+            </p>
+          </div>
+        </div>
+        <div class="p-6 pt-0">
+          <span class="text-xs text-amber-600 font-semibold inline-flex items-center gap-1 group">
+            Reportar incidente
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
+        </div>
+      </a>
+
+      {/* Program 3: Asesorías Legales */}
+      <a
+        id="program-card-legal"
+        href={url('/programas/asesoria-juridica-comunitaria')}
+        class="bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden text-left flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer group"
+      >
+        <div>
+          <div class="w-full h-48 sm:h-56 relative overflow-hidden bg-slate-100 border-b border-slate-100">
+            <img
+              src={typeof asesoriasImageSrc === 'string' ? asesoriasImageSrc : (asesoriasImageSrc as any)?.src || asesoriasImageSrc}
+              alt="Asesorías Legales"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+            />
+            <span class="absolute top-3 left-3 bg-brand-primary text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider z-20 shadow-xs">
+              Justicia y Paz
+            </span>
+          </div>
+          <div class="p-6 space-y-2">
+            <h3 class="font-display font-bold text-lg text-slate-950 leading-tight group-hover:text-blue-700 transition-colors">
+              Asesorías Legales
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Consultoría jurídica gratuita en derecho civil, laboral, penal, de familia, pensiones y constitucional para personas de escasos recursos en Medellín.
+            </p>
+          </div>
+        </div>
+        <div class="p-6 pt-0">
+          <span class="text-xs text-brand-primary font-semibold inline-flex items-center gap-1 group">
+            Radicar consulta
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  {/* 4. TESTIMONIALS SECTION */}
+  <section class="space-y-8" id="testimonials">
+    <div class="text-center space-y-2">
+      <span class="text-xs font-bold text-sky-800 uppercase tracking-widest block">Voces de Esperanza</span>
+      <h2 class="font-display font-black text-2xl sm:text-4xl text-brand-dark tracking-tight">
+        Testimonios de Nuestra Comunidad
+      </h2>
+      <div class="w-16 h-1 bg-brand-green mx-auto rounded-full"></div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+      {TESTIMONIALS.map((t) => (
+        <div
+          id={`testimonial-${t.id}`}
+          class="bg-white p-6 rounded-2xl border border-slate-100 shadow-xs flex flex-col justify-between text-left relative"
+        >
+          <div class="absolute top-4 right-4 text-sky-100">
+            <svg class="w-10 h-10 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
+              <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/>
+            </svg>
+          </div>
+          
+          <div class="space-y-3 relative z-10">
+            <p class="text-xs text-slate-600 leading-relaxed italic">
+              "{t.quote}"
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3 pt-4 border-t border-slate-50 mt-4 shrink-0">
+            <img
+              src={t.avatar}
+              alt={t.name || "Testimonio"}
+              class="w-10 h-10 rounded-full object-cover border border-slate-200"
+              referrerpolicy="no-referrer"
+            />
+            {(t.name || t.role) && (
+              <div>
+                {t.name && <h4 class="font-bold text-xs text-slate-900">{t.name}</h4>}
+                {t.role && <p class="text-[10px] text-slate-400 font-medium">{t.role}</p>}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  {/* 5. NUESTROS PROYECTOS */}
+  <section class="space-y-8" id="nuestros-proyectos">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
+      <div class="space-y-1.5 text-left">
+        <span class="text-xs font-bold text-sky-800 uppercase tracking-widest block">Iniciativas</span>
+        <h2 class="font-display font-black text-2xl sm:text-3xl text-brand-dark tracking-tight">
+          Nuestros Proyectos de Impacto
+        </h2>
+      </div>
+      <a
+        id="view-all-projects-btn"
+        href={url('/proyectos')}
+        class="text-xs font-bold text-brand-primary hover:text-blue-800 flex items-center gap-1 cursor-pointer transition-colors"
+      >
+        Ver todos los proyectos
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div id="home-projects-container">
+      {initialProjects.length === 0 ? (
+        <div class="bg-white rounded-3xl p-12 text-center border border-dashed border-slate-200" id="home-projects-empty">
+          <p class="text-sm text-slate-500 font-medium">No hay proyectos publicados actualmente en WordPress.</p>
+        </div>
+      ) : (
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="home-projects-grid">
+          {initialProjects.slice(0, 3).map((proj) => (
+            <div
+              id={`project-card-${proj.id}`}
+              class="bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden text-left flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer group"
+              onclick={`window.location.href = '${proj.slug ? url(`/blog/${proj.slug}`) : url('/proyectos')}'`}
+            >
+              <div>
+                <div class="w-full h-48 relative overflow-hidden bg-slate-100 border-b border-slate-100">
+                  <img
+                    src={proj.image}
+                    alt={proj.title}
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+                <div class="p-5 space-y-2">
+                  <span class="inline-block px-2.5 py-0.5 rounded-md bg-sky-50 text-[10px] font-bold text-sky-700 uppercase tracking-wider">
+                    {proj.category || 'Proyecto'}
+                  </span>
+                  <h3 
+                    class="font-display font-bold text-sm sm:text-base text-slate-900 leading-snug group-hover:text-sky-700 transition-colors line-clamp-2"
+                    set:html={proj.title}
+                  />
+                  <p class="text-xs text-slate-500 leading-relaxed">
+                    {getWordExcerpt(proj.content || proj.description, 50)}
+                  </p>
+                </div>
+              </div>
+              <div class="p-5 pt-0">
+                <a
+                  href={proj.slug ? url(`/blog/${proj.slug}`) : url('/proyectos')}
+                  onclick="event.stopPropagation()"
+                  class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
+                >
+                  <span>Leer más</span>
+                  <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  {/* 6. DONATION HERO BANNER SECTION */}
+  <section class="bg-gradient-to-br from-brand-red to-red-800 text-white rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden shadow-xl" id="donation-banner-block">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.1),transparent)]"></div>
+    <div class="absolute right-10 top-10 opacity-5">
+      <svg class="w-56 h-56 fill-white text-white" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+      </svg>
+    </div>
+    
+    <div class="relative z-10 max-w-2xl mx-auto space-y-6">
+      <svg class="w-12 h-12 fill-white text-white mx-auto animate-pulse" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+      </svg>
+      <h2 class="font-display font-black text-2xl sm:text-4xl tracking-tight leading-none">
+        Únete a la Causa de Paz y Justicia
+      </h2>
+      <p class="text-sm sm:text-base text-red-100 max-w-md mx-auto leading-relaxed">
+        Tu generosidad permite sostener el consultorio jurídico, financiar programas de liderazgo infantil y alertar violaciones de Derechos Humanos en Medellín.
+      </p>
+      <div class="pt-2 flex justify-center">
+        <button
+          id="banner-donate-now-btn"
+          type="button"
+          class="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-slate-50 text-brand-red font-extrabold rounded-xl text-sm transition-all shadow-md hover:shadow-lg cursor-pointer"
+        >
+          Donar Ahora (Código QR / Transferencia)
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  function setupHome() {
+    const donateButtons = document.querySelectorAll('#hero-donate-btn, #banner-donate-now-btn');
+    donateButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('open-donation-modal'));
+      });
+    });
+
+    // Sincronización en vivo cliente si no vino pre-cargado
+    const fetchLiveWordPressProjects = async () => {
+      try {
+        const res = await fetch('https://www.csm.fundelibertad.org/wp-json/wp/v2/posts?_embed=1&per_page=50');
+        if (!res.ok) return;
+        const rawPosts = await res.json();
+        if (!Array.isArray(rawPosts)) return;
+
+        const projectPosts = rawPosts.filter((post: any) => {
+          if (post.slug === 'hello-world' || post.id === 1) return false;
+          const terms: any[] = post._embedded?.['wp:term']?.[0] || [];
+          const validTerms = terms.filter((t: any) => {
+            const name = (t.name || '').toLowerCase();
+            const slug = (t.slug || '').toLowerCase();
+            return name !== 'uncategorized' && name !== 'sin categoría' && slug !== 'uncategorized';
+          });
+          if (validTerms.length === 0) return false;
+          return validTerms.some((t: any) => 
+            t.slug.toLowerCase().includes('proyecto') || 
+            t.name.toLowerCase().includes('proyecto')
+          );
+        }).slice(0, 3);
+
+        const container = document.getElementById('home-projects-container');
+        if (projectPosts.length > 0 && container) {
+          const baseUrl = window.location.pathname.startsWith('/fundelibertad') ? '/fundelibertad' : '';
+          container.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="home-projects-grid">
+              ${projectPosts.map((post: any) => {
+                const terms: any[] = post._embedded?.['wp:term']?.[0] || [];
+                const catNames = terms.map(t => t.name).filter(c => c.toLowerCase() !== 'uncategorized' && c.toLowerCase() !== 'sin categoría');
+                const specificCat = catNames.find(c => c.toLowerCase() !== 'proyectos') || catNames[0] || 'Proyectos';
+                const media = post._embedded?.['wp:featuredmedia']?.[0];
+                const featuredImg = media?.source_url || media?.media_details?.sizes?.large?.source_url || 'https://lh3.googleusercontent.com/d/11y3-Zw7P020zrMq6cakM0RrvsjrFlzW5';
+                const link = `${baseUrl}/blog/${post.slug}`;
+                const plainExcerpt = (post.excerpt?.rendered || '').replace(/<[^>]*>?/gm, '').trim();
+                const excerptWords = plainExcerpt.split(/\\s+/).filter(Boolean);
+                const excerpt = excerptWords.length > 50 ? excerptWords.slice(0, 50).join(' ') + '...' : plainExcerpt;
+
+                return `
+                  <div
+                    id="project-card-wp-${post.id}"
+                    class="bg-white rounded-3xl border border-slate-100 shadow-xs overflow-hidden text-left flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer group"
+                    onclick="window.location.href = '${link}'"
+                  >
+                    <div>
+                      <div class="w-full h-48 relative overflow-hidden bg-slate-100 border-b border-slate-100">
+                        <img
+                          src="${featuredImg}"
+                          alt="${post.title.rendered}"
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div class="p-5 space-y-2">
+                        <span class="inline-block px-2.5 py-0.5 rounded-md bg-sky-50 text-[10px] font-bold text-sky-700 uppercase tracking-wider">
+                          ${specificCat}
+                        </span>
+                        <h3 
+                          class="font-display font-bold text-sm sm:text-base text-slate-900 leading-snug group-hover:text-sky-700 transition-colors line-clamp-2"
+                        >
+                          ${post.title.rendered}
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                          ${excerpt}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="p-5 pt-0">
+                      <a
+                        href="${link}"
+                        onclick="event.stopPropagation()"
+                        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
+                      >
+                        <span>Leer más</span>
+                        <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                      </a>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+      } catch (e) {
+        // Fallback gracefully
+      }
+    };
+
+    fetchLiveWordPressProjects();
+  }
+
+  setupHome();
+  document.addEventListener('astro:page-load', setupHome);
+</script>

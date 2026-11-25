@@ -1,6 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import HomeSection from '../components/sections/HomeSection';
+import HomeSection from '../components/sections/HomeSection.astro';
 import { getPosts, getFeaturedImageUrl, getPostCategories, hasValidCategory } from '../lib/wordpress';
 import type { WPActivityItem } from '../components/sections/ActivitiesSection';
 
@@ -45,5 +45,5 @@ const homeProjects: WPActivityItem[] = wpProjectPosts.map((post) => {
 ---
 
 <PageLayout title="FUNDELIBERTAD | Inicio - Defendiendo los Derechos Humanos">
-  <HomeSection client:idle initialProjects={homeProjects} />
+  <HomeSection initialProjects={homeProjects} />
 </PageLayout>

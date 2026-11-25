@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import ProgramSections from '../../components/sections/ProgramSections';
+import ProgramSections from '../../components/sections/ProgramSections.astro';
 import { getPosts, getFeaturedImageUrl, getPostCategories, hasValidCategory } from '../../lib/wordpress';
 import type { WPActivityItem } from '../../components/sections/ActivitiesSection';
 
@@ -44,7 +44,6 @@ const initialInternshipPosts: WPActivityItem[] = internshipRawPosts.map(post => 
   description="Convocatoria para estudiantes de derecho, trabajo social y carreras afines para realizar sus prácticas en FUNDELIBERTAD."
 >
   <ProgramSections 
-    client:idle 
     initialSubsection="internships" 
     initialInternshipPosts={initialInternshipPosts} 
   />

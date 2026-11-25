@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import ProgramSections from '../../components/sections/ProgramSections';
+import ProgramSections from '../../components/sections/ProgramSections.astro';
 import { getPosts, getFeaturedImageUrl, getPostCategories, hasValidCategory } from '../../lib/wordpress';
 import type { WPActivityItem } from '../../components/sections/ActivitiesSection';
 
@@ -49,7 +49,6 @@ const initialReportsPosts: WPActivityItem[] = reportsRawPosts.map(post => {
   description="Canal confidencial de radicación e informe de vulneraciones a los derechos humanos."
 >
   <ProgramSections 
-    client:idle 
     initialSubsection="reports" 
     initialReportsPosts={initialReportsPosts} 
   />
