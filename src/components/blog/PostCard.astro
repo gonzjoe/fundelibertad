@@ -1,0 +1,90 @@
+---
+import { url } from '../../lib/base';
+
+interface Props {
+  title: string;
+  description?: string;
+  slug: string;
+  image?: string;
+  category?: string;
+  pubDate?: Date | string;
+  author?: string;
+}
+
+const {
+  title,
+  description = '',
+  slug,
+  image = 'https://lh3.googleusercontent.com/d/1mzMGHUgDdHcX8hpf8DTMLIs2Dv53CCsd',
+  category,
+  pubDate,
+  author,
+} = Astro.props;
+
+const dateFormatted = pubDate
+  ? new Date(pubDate).toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  : null;
+---
+
+<article class="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group h-full">
+  {/* Imagen de Portada */}
+  <a href={url(`/blog/${slug}`)} class="relative h-52 overflow-hidden bg-slate-100 block">
+    <img
+      src={image}
+      alt={title}
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+    {category && (
+      <span class="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-lg text-xs font-bold text-brand-primary shadow-xs">
+        {category}
+      </span>
+    )}
+  </a>
+
+  {/* Contenido */}
+  <div class="p-6 flex flex-col flex-grow justify-between space-y-4">
+    <div class="space-y-3">
+      {dateFormatted && (
+        <div class="flex items-center gap-3 text-xs text-slate-400 font-medium">
+          <span class="flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            {dateFormatted}
+          </span>
+          {author && <span>• Por {author}</span>}
+        </div>
+      )}
+
+      <h2 class="font-display font-bold text-xl text-slate-900 group-hover:text-brand-primary transition-colors leading-snug">
+        <a href={url(`/blog/${slug}`)}>
+          <span set:html={title} />
+        </a>
+      </h2>
+
+      {description && (
+        <div
+          class="text-xs text-slate-500 line-clamp-3 leading-relaxed"
+          set:html={description}
+        />
+      )}
+    </div>
+
+    <div class="pt-2 border-t border-slate-100/80">
+      <a
+        href={url(`/blog/${slug}`)}
+        class="inline-flex items-center gap-1.5 text-xs font-bold text-brand-primary group-hover:text-brand-dark transition-colors"
+      >
+        <span>Leer artículo completo</span>
+        <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</article>

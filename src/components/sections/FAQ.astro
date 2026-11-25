@@ -1,0 +1,56 @@
+---
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  title?: string;
+  items?: FAQItem[];
+}
+
+const {
+  title = 'Preguntas Frecuentes',
+  items = [
+    {
+      question: '¿Las asesorías jurídicas tienen algún costo?',
+      answer: 'No. Todos los servicios de orientación legal y derechos humanos brindados por FUNDELIBERTAD son 100% gratuitos para la comunidad.',
+    },
+    {
+      question: '¿Qué tipo de casos atienden?',
+      answer: 'Atendemos reclamaciones laborales, pensiones, tutelas de salud, derecho de familia (alimentos y custodia), derechos de petición y quejas por vulneración de derechos fundamentales.',
+    },
+    {
+      question: '¿Cómo puedo acceder al programa de prácticas y pasantías?',
+      answer: 'Estudiantes de bachillerato, técnicos, tecnólogos y universitarios pueden postular su hoja de vida y carta de presentación institucional a info@fundelibertad.org.',
+    },
+    {
+      question: '¿Dónde están ubicados?',
+      answer: 'Nuestra sede comunitaria está ubicada en la Comuna 15 Guayabal en Medellín, Colombia. También contamos con atención virtual permanente a través de WhatsApp.',
+    },
+  ],
+} = Astro.props;
+---
+
+<section class="py-12 max-w-4xl mx-auto space-y-8">
+  <div class="text-center space-y-2">
+    <span class="text-xs font-bold uppercase tracking-wider text-brand-primary">Resuelve tus dudas</span>
+    <h2 class="font-display font-black text-3xl text-brand-dark">{title}</h2>
+  </div>
+
+  <div class="space-y-4">
+    {items.map((item) => (
+      <details class="group bg-white rounded-2xl border border-slate-100 shadow-2xs p-5 transition-all">
+        <summary class="list-none flex items-center justify-between cursor-pointer font-bold text-sm text-slate-800 group-open:text-brand-primary">
+          <span>{item.question}</span>
+          <svg class="w-4 h-4 shrink-0 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </summary>
+        <p class="pt-3 text-xs text-slate-600 leading-relaxed border-t border-slate-50 mt-3">
+          {item.answer}
+        </p>
+      </details>
+    ))}
+  </div>
+</section>

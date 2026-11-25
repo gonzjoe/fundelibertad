@@ -1,0 +1,51 @@
+---
+import { url } from '../../lib/base';
+
+export interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items?: BreadcrumbItem[];
+}
+
+const { items = [] } = Astro.props;
+
+// Siempre incluimos "Inicio" como primer elemento
+const allItems: BreadcrumbItem[] = [
+  { label: 'Inicio', href: '/' },
+  ...items
+];
+---
+
+{allItems.length > 1 && (
+  <nav aria-label="Migas de pan" class="py-3 text-xs text-slate-400">
+    <ol class="flex flex-wrap items-center gap-1.5 list-none p-0 m-0" itemscope itemtype="https://schema.org/BreadcrumbList">
+      {allItems.map((item, index) => {
+        const isLast = index === allItems.length - 1;
+        return (
+          <li class="flex items-center gap-1.5" itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            {index > 0 && (
+              <span class="text-slate-300 select-none" aria-hidden="true">/</span>
+            )}
+            {item.href && !isLast ? (
+              <a
+                href={url(item.href)}
+                class="hover:text-brand-primary transition-colors font-medium text-slate-500"
+                itemprop="item"
+              >
+                <span itemprop="name">{item.label}</span>
+              </a>
+            ) : (
+              <span class="font-bold text-slate-800" itemprop="name" aria-current="page">
+                {item.label}
+              </span>
+            )}
+            <meta itemprop="position" content={String(index + 1)} />
+          </li>
+        );
+      })}
+    </ol>
+  </nav>
+)}

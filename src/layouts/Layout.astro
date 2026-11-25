@@ -1,84 +1,16 @@
 ---
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import FloatingWhatsApp from '../components/FloatingWhatsApp';
-import DonationWrapper from '../components/DonationWrapper';
-import '../index.css';
+import PageLayout from './PageLayout.astro';
 
 interface Props {
   title?: string;
   description?: string;
   image?: string;
+  fullWidth?: boolean;
 }
 
-const {
-  title = 'FUNDELIBERTAD | Fundación de Derechos Humanos por la Libertad y la Vida',
-  description = 'Más de 15 años promoviendo la paz, brindando asesoría jurídica gratuita y apoyando el desarrollo de familias y jóvenes vulnerables en la Comuna 15 Guayabal, Medellín.',
-  image = 'https://lh3.googleusercontent.com/d/1nD4GYM2rbdNHtX0xdR3yI0XlC7MQfzps',
-} = Astro.props;
-
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://fundelibertad.org');
+const props = Astro.props;
 ---
 
-<!doctype html>
-<html lang="es" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1nD4GYM2rbdNHtX0xdR3yI0XlC7MQfzps" />
-    <meta name="generator" content={Astro.generator} />
-
-    <!-- SEO Primary -->
-    <title>{title}</title>
-    <meta name="title" content={title} />
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonicalURL} />
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonicalURL} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={image} />
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={image} />
-
-    <!-- Performance Resource Hints -->
-    <link rel="dns-prefetch" href="https://lh3.googleusercontent.com" />
-    <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
-    <link rel="dns-prefetch" href="https://www.csm.fundelibertad.org" />
-    <link rel="preconnect" href="https://www.csm.fundelibertad.org" crossorigin />
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Libre+Bodoni:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <!-- React Refresh Preamble for Vite Dev Mode -->
-    {import.meta.env.DEV && (
-      <script type="module" is:inline>
-        import RefreshRuntime from '/@react-refresh';
-        RefreshRuntime.injectIntoGlobalHook(window);
-        window.$RefreshReg$ = () => {};
-        window.$RefreshSig$ = () => (type) => type;
-        window.__vite_plugin_react_preamble_installed__ = true;
-      </script>
-    )}
-  </head>
-  <body class="min-h-screen bg-brand-lightbg flex flex-col justify-between text-slate-700 antialiased selection:bg-brand-primary selection:text-white">
-    <Header client:load currentPath={Astro.url.pathname} />
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 relative" id="main-content">
-      <slot />
-    </main>
-    <Footer client:load />
-    <FloatingWhatsApp client:load />
-    <DonationWrapper client:load />
-  </body>
-</html>
+<PageLayout {...props}>
+  <slot />
+</PageLayout>

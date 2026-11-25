@@ -1,0 +1,55 @@
+---
+import { url } from '../../lib/base';
+
+interface Props {
+  badge?: string;
+  title?: string;
+  description?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  secondaryText?: string;
+  secondaryHref?: string;
+}
+
+const {
+  badge = 'Organización de Derechos Humanos • Comuna 15 Guayabal',
+  title = 'Defendiendo la Libertad, la Vida y la Convivencia Pacífica',
+  description = 'Más de 15 años brindando asesoría jurídica gratuita, acompañamiento social a familias y programas de liderazgo juvenil en Medellín.',
+  ctaText = 'Solicitar Asesoría Gratuita',
+  ctaHref = '/servicios',
+  secondaryText = 'Conocer Nuestra Historia',
+  secondaryHref = '/nosotros',
+} = Astro.props;
+---
+
+<section class="py-12 md:py-20 text-center relative overflow-hidden">
+  <div class="max-w-4xl mx-auto space-y-6">
+    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-bold uppercase tracking-wider">
+      <span class="w-2 h-2 rounded-full bg-brand-primary animate-pulse"></span>
+      {badge}
+    </span>
+
+    <h1 class="font-display font-black text-4xl sm:text-5xl md:text-6xl text-brand-dark tracking-tight leading-[1.1]">
+      {title}
+    </h1>
+
+    <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+      {description}
+    </p>
+
+    <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
+      <a
+        href={url(ctaHref)}
+        class="px-7 py-3.5 rounded-2xl bg-brand-primary hover:bg-brand-dark text-white font-bold text-sm shadow-md hover:shadow-xl transition-all duration-300"
+      >
+        {ctaText}
+      </a>
+      <a
+        href={url(secondaryHref)}
+        class="px-7 py-3.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm border border-slate-200 shadow-2xs hover:shadow transition-all"
+      >
+        {secondaryText}
+      </a>
+    </div>
+  </div>
+</section>

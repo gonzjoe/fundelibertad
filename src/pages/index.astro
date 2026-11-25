@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import PageLayout from '../layouts/PageLayout.astro';
 import HomeSection from '../components/sections/HomeSection';
 import { getPosts, getFeaturedImageUrl, getPostCategories, hasValidCategory } from '../lib/wordpress';
 import type { WPActivityItem } from '../components/sections/ActivitiesSection';
@@ -44,6 +44,6 @@ const homeProjects: WPActivityItem[] = wpProjectPosts.map((post) => {
 });
 ---
 
-<Layout title="FUNDELIBERTAD | Inicio - Defendiendo los Derechos Humanos">
+<PageLayout title="FUNDELIBERTAD | Inicio - Defendiendo los Derechos Humanos">
   <HomeSection client:load initialProjects={homeProjects} />
-</Layout>
+</PageLayout>

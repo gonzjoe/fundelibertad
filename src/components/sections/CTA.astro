@@ -1,0 +1,41 @@
+---
+import { url } from '../../lib/base';
+
+interface Props {
+  title?: string;
+  description?: string;
+  buttonText?: string;
+  buttonHref?: string;
+}
+
+const {
+  title = '¿Necesitas Orientación Legal o Acompañamiento Comunitario?',
+  description = 'Nuestro consultorio jurídico y equipo de defensores de DDHH está listo para atender tu caso de forma confidencial y 100% gratuita.',
+  buttonText = 'Contáctanos por WhatsApp',
+  buttonHref = 'https://wa.me/573002167822?text=Hola%20FUNDELIBERTAD%2C%20necesito%20asesor%C3%ADa.',
+} = Astro.props;
+---
+
+<section class="my-16 rounded-3xl bg-gradient-to-r from-brand-dark via-slate-900 to-brand-primary text-white p-8 sm:p-14 text-center relative overflow-hidden shadow-2xl">
+  <div class="max-w-2xl mx-auto space-y-6 relative z-10">
+    <h2 class="font-display font-black text-2xl sm:text-4xl tracking-tight leading-snug">
+      {title}
+    </h2>
+    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+      {description}
+    </p>
+    <div class="pt-2">
+      <a
+        href={buttonHref.startsWith('http') ? buttonHref : url(buttonHref)}
+        target={buttonHref.startsWith('http') ? '_blank' : undefined}
+        rel={buttonHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+        class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg hover:shadow-2xl transition-all duration-300"
+      >
+        <span>{buttonText}</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

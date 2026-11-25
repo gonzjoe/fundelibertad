@@ -1,0 +1,58 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import { getAllUnifiedPosts } from '../../../lib/blog';
+import { slugify } from '../../../utils/slugify';
+import { url } from '../../../lib/base';
+
+const posts = await getAllUnifiedPosts();
+const catMap = new Map<string, number>();
+for (const p of posts) {
+  if (p.category) {
+    catMap.set(p.category, (catMap.get(p.category) || 0) + 1);
+  }
+}
+
+const categories = Array.from(catMap.entries()).map(([name, count]) => ({
+  name,
+  count,
+  slug: slugify(name),
+}));
+---
+
+<PageLayout
+  title="Categorías del Blog | FUNDELIBERTAD"
+  description="Explora los artículos, noticias e informes organizados por temática y categoría de derechos humanos."
+  breadcrumbs={[
+    { label: 'Blog', href: '/blog' },
+    { label: 'Categorías' },
+  ]}
+>
+  <div class="max-w-4xl mx-auto space-y-10 py-6">
+    <header class="space-y-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-brand-primary">Índice Temático</span>
+      <h1 class="font-display font-black text-3xl sm:text-4xl text-brand-dark">Todas las Categorías</h1>
+      <p class="text-sm text-slate-600">
+        Selecciona una categoría para ver todos los artículos e investigaciones relacionadas:
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      {categories.map((cat) => (
+        <a
+          href={url(`/blog/categoria/${cat.slug}`)}
+          class="p-6 rounded-2xl bg-white border border-slate-100 shadow-2xs hover:shadow-md hover:border-brand-primary/40 transition-all flex items-center justify-between group"
+        >
+          <div>
+            <h2 class="font-bold text-sm text-slate-800 group-hover:text-brand-primary transition-colors">
+              {cat.name}
+            </h2>
+            <span class="text-xs text-slate-400">{cat.count} {cat.count === 1 ? 'artículo' : 'artículos'}</span>
+          </div>
+          <span class="text-slate-300 group-hover:text-brand-primary group-hover:translate-x-1 transition-all text-sm font-bold">
+            →
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</PageLayout>

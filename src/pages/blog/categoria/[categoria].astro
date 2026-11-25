@@ -1,0 +1,77 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import PostCard from '../../../components/blog/PostCard.astro';
+import { getAllUnifiedPosts, type UnifiedPost } from '../../../lib/blog';
+import { slugify } from '../../../utils/slugify';
+import { url } from '../../../lib/base';
+
+export async function getStaticPaths() {
+  const posts = await getAllUnifiedPosts();
+  const catMap = new Map<string, { name: string; posts: UnifiedPost[] }>();
+
+  for (const post of posts) {
+    if (post.category) {
+      const slug = slugify(post.category);
+      if (!catMap.has(slug)) {
+        catMap.set(slug, { name: post.category, posts: [] });
+      }
+      catMap.get(slug)!.posts.push(post);
+    }
+  }
+
+  return Array.from(catMap.entries()).map(([catSlug, data]) => ({
+    params: { categoria: catSlug },
+    props: {
+      categoryName: data.name,
+      categorySlug: catSlug,
+      posts: data.posts,
+    },
+  }));
+}
+
+const { categoryName, posts } = Astro.props;
+---
+
+<PageLayout
+  title={`Categoría: ${categoryName} | Blog FUNDELIBERTAD`}
+  description={`Artículos, informes y novedades publicadas bajo la categoría ${categoryName}.`}
+  breadcrumbs={[
+    { label: 'Blog', href: '/blog' },
+    { label: 'Categorías', href: '/blog/categoria' },
+    { label: categoryName },
+  ]}
+>
+  <div class="space-y-10">
+    <header class="max-w-3xl space-y-3">
+      <span class="inline-flex px-3 py-1 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-bold uppercase tracking-wider">
+        Categoría
+      </span>
+      <h1 class="font-display font-black text-3xl sm:text-4xl text-brand-dark">
+        {categoryName}
+      </h1>
+      <p class="text-sm text-slate-500">
+        Mostrando {posts.length} {posts.length === 1 ? 'publicación' : 'publicaciones'} en esta sección.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {posts.map((post) => (
+        <PostCard
+          title={post.title}
+          description={post.description}
+          slug={post.slug}
+          image={post.image}
+          category={post.category}
+          pubDate={post.pubDate}
+          author={post.author}
+        />
+      ))}
+    </div>
+
+    <div class="pt-8 border-t border-slate-100">
+      <a href={url('/blog/categoria')} class="text-xs font-bold text-brand-primary hover:underline">
+        ← Volver a todas las categorías
+      </a>
+    </div>
+  </div>
+</PageLayout>

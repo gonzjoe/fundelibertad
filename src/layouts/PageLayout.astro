@@ -1,0 +1,42 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import Breadcrumbs, { type BreadcrumbItem } from '../components/layout/Breadcrumbs.astro';
+import FloatingWhatsApp from '../components/FloatingWhatsApp';
+import DonationWrapper from '../components/DonationWrapper';
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  breadcrumbs?: BreadcrumbItem[];
+  fullWidth?: boolean;
+}
+
+const {
+  title,
+  description,
+  image,
+  breadcrumbs,
+  fullWidth = false,
+} = Astro.props;
+---
+
+<BaseLayout title={title} description={description} image={image}>
+  <Header currentPath={Astro.url.pathname} />
+
+  {breadcrumbs && breadcrumbs.length > 0 && (
+    <div class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+      <Breadcrumbs items={breadcrumbs} />
+    </div>
+  )}
+
+  <main class={fullWidth ? "flex-grow w-full relative" : "flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 relative"} id="main-content">
+    <slot />
+  </main>
+
+  <Footer />
+  <FloatingWhatsApp client:load />
+  <DonationWrapper client:load />
+</BaseLayout>

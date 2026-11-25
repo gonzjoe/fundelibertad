@@ -1,187 +1,37 @@
 ---
-import Layout from '../../layouts/Layout.astro';
-import { getPosts, getPostBySlug, getFeaturedImageUrl, getPostCategories, getAuthorName, hasValidCategory, type WPPost } from '../../lib/wordpress';
-import { Calendar, User, ArrowLeft, Tag, Heart, Share2, MessageCircle } from 'lucide-react';
-import { url } from '../../lib/base';
+import BlogPostLayout from '../../layouts/BlogPostLayout.astro';
+import { getAllUnifiedPosts, type UnifiedPost } from '../../lib/blog';
+import { render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getPosts(100);
-  return posts.filter(hasValidCategory).map((post) => ({
+  const posts = await getAllUnifiedPosts();
+  return posts.map((post) => ({
     params: { slug: post.slug },
     props: { post },
   }));
 }
 
-const { slug } = Astro.params;
-const { post: staticPost } = Astro.props;
-const post = (staticPost as WPPost) || (slug ? await getPostBySlug(slug) : null);
+const { post } = Astro.props as { post: UnifiedPost };
 
-if (!post) {
-  return Astro.redirect(url('/blog'));
+let Content = null;
+if (post.isMarkdown && post.entry) {
+  const rendered = await render(post.entry);
+  Content = rendered.Content;
 }
-
-const featuredImg = getFeaturedImageUrl(post, 'https://lh3.googleusercontent.com/d/1mzMGHUgDdHcX8hpf8DTMLIs2Dv53CCsd');
-const categories = getPostCategories(post);
-const isProject = categories.some((c: string) => c.toLowerCase().includes('proyecto'));
-const authorName = getAuthorName(post);
-const dateStr = new Date(post.date).toLocaleDateString('es-CO', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric'
-});
 ---
 
-<Layout
-  title={`${post.title.rendered} | FUNDELIBERTAD Blog`}
-  description={post.excerpt.rendered.replace(/<[^>]*>?/gm, '').slice(0, 160)}
-  image={featuredImg}
+<BlogPostLayout
+  title={post.title}
+  description={post.description}
+  pubDate={post.pubDate}
+  author={post.author}
+  image={post.image}
+  category={post.category}
+  tags={post.tags}
 >
-  <article class="py-12">
-    {/* Header Article */}
-    <header class="max-w-4xl mx-auto space-y-6 text-center">
-      {categories.length > 0 && (
-        <div class="flex items-center justify-center gap-2">
-          {categories.map((cat) => (
-            <span class="px-3 py-1 rounded-full bg-sky-100 text-brand-primary text-xs font-bold uppercase tracking-wider">
-              {cat}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <h1
-        class="font-display font-black text-3xl sm:text-5xl text-brand-dark tracking-tight leading-tight"
-        set:html={post.title.rendered}
-      />
-
-      <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 pt-2 border-b border-slate-200/60 pb-6">
-        <span class="flex items-center gap-1.5 font-medium">
-          <Calendar className="w-4 h-4 text-slate-400" />
-          {dateStr}
-        </span>
-        <span class="flex items-center gap-1.5 font-medium">
-          <User className="w-4 h-4 text-slate-400" />
-          Por {authorName}
-        </span>
-      </div>
-    </header>
-
-    {/* Featured Image */}
-    {featuredImg && (
-      <div class="w-full max-w-5xl mx-auto my-10 flex justify-center">
-        <div class="w-full rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 aspect-video max-h-[560px] flex items-center justify-center">
-          <img
-            src={featuredImg}
-            alt={post.title.rendered}
-            class="w-full h-full object-cover object-center"
-            loading="eager"
-          />
-        </div>
-      </div>
-    )}
-
-    {/* Article Content */}
-    <div class="max-w-4xl mx-auto">
-      <div
-        class="wp-content bg-white p-6 sm:p-12 rounded-3xl shadow-xs border border-slate-100 text-slate-700 leading-relaxed text-base space-y-6"
-        set:html={post.content.rendered}
-      />
-
-      {/* Botón Volver al final del contenido */}
-      <div class="pt-8 pb-2 flex justify-start">
-        <a
-          href={isProject ? url('/proyectos') : url('/actividades')}
-          onclick="if(window.history.length > 1){ window.history.back(); return false; }"
-          class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-brand-primary transition-colors bg-white hover:bg-slate-50 px-5 py-2.5 rounded-xl shadow-xs border border-slate-200 cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Volver a todas las entradas
-        </a>
-      </div>
-
-      {/* Institutional Call To Action */}
-      <div class="mt-12 bg-gradient-to-r from-sky-50 to-emerald-50 rounded-3xl p-8 border border-sky-100 flex flex-col sm:flex-row items-center justify-between gap-6">
-        <div class="space-y-1 text-center sm:text-left">
-          <h3 class="font-display font-bold text-lg text-brand-dark">¿Deseas apoyar nuestra labor comunitaria?</h3>
-          <p class="text-xs text-slate-600">Cada donación nos permite defender derechos y brindar asesoría jurídica sin costo.</p>
-        </div>
-        <div class="flex items-center gap-3">
-          <button
-            onclick="window.dispatchEvent(new CustomEvent('open-donation-modal'))"
-            class="px-5 py-2.5 bg-brand-red hover:bg-red-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap"
-          >
-            <Heart className="w-4 h-4 fill-white" />
-            Donar Ahora
-          </button>
-          <a
-            href="https://wa.me/573002167822"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap"
-          >
-            <MessageCircle className="w-4 h-4" />
-            Contactar
-          </a>
-        </div>
-      </div>
-    </div>
-  </article>
-</Layout>
-
-<style is:global>
-  /* Estilos para el contenido renderizado desde WordPress Gutenberg/Classic */
-  .wp-content p {
-    margin-bottom: 1.5rem;
-    line-height: 1.8;
-  }
-  .wp-content h2 {
-    font-family: var(--font-display);
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #0a0a0a;
-    margin-top: 2.25rem;
-    margin-bottom: 1rem;
-    letter-spacing: -0.02em;
-  }
-  .wp-content h3 {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #0a0a0a;
-    margin-top: 1.75rem;
-    margin-bottom: 0.75rem;
-  }
-  .wp-content ul {
-    list-style-type: disc;
-    padding-left: 1.75rem;
-    margin-bottom: 1.5rem;
-    space-y: 0.5rem;
-  }
-  .wp-content ol {
-    list-style-type: decimal;
-    padding-left: 1.75rem;
-    margin-bottom: 1.5rem;
-    space-y: 0.5rem;
-  }
-  .wp-content blockquote {
-    border-left: 4px solid #2d88c4;
-    padding-left: 1.25rem;
-    font-style: italic;
-    color: #4b5563;
-    margin: 1.75rem 0;
-  }
-  .wp-content img {
-    border-radius: 1rem;
-    max-width: 100%;
-    height: auto;
-    margin: 1.5rem auto;
-  }
-  .wp-content a {
-    color: #2d88c4;
-    text-decoration: underline;
-    font-weight: 600;
-  }
-  .wp-content a:hover {
-    color: #1a5680;
-  }
-</style>
+  {Content ? (
+    <Content />
+  ) : (
+    <div class="wp-content text-slate-700 leading-relaxed text-base space-y-6" set:html={post.content} />
+  )}
+</BlogPostLayout>

@@ -1,0 +1,81 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import PostCard from '../../../components/blog/PostCard.astro';
+import { getAllUnifiedPosts, type UnifiedPost } from '../../../lib/blog';
+import { slugify } from '../../../utils/slugify';
+import { url } from '../../../lib/base';
+
+export async function getStaticPaths() {
+  const posts = await getAllUnifiedPosts();
+  const tagMap = new Map<string, { name: string; posts: UnifiedPost[] }>();
+
+  for (const post of posts) {
+    if (post.tags && Array.isArray(post.tags)) {
+      for (const t of post.tags) {
+        if (t) {
+          const s = slugify(t);
+          if (!tagMap.has(s)) {
+            tagMap.set(s, { name: t, posts: [] });
+          }
+          tagMap.get(s)!.posts.push(post);
+        }
+      }
+    }
+  }
+
+  return Array.from(tagMap.entries()).map(([tagSlug, data]) => ({
+    params: { etiqueta: tagSlug },
+    props: {
+      tagName: data.name,
+      tagSlug,
+      posts: data.posts,
+    },
+  }));
+}
+
+const { tagName, posts } = Astro.props;
+---
+
+<PageLayout
+  title={`Etiqueta: #${tagName} | Blog FUNDELIBERTAD`}
+  description={`Artículos e informes etiquetados con #${tagName}.`}
+  breadcrumbs={[
+    { label: 'Blog', href: '/blog' },
+    { label: 'Etiquetas', href: '/blog/etiqueta' },
+    { label: `#${tagName}` },
+  ]}
+>
+  <div class="space-y-10">
+    <header class="max-w-3xl space-y-3">
+      <span class="inline-flex px-3 py-1 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-bold uppercase tracking-wider">
+        Etiqueta
+      </span>
+      <h1 class="font-display font-black text-3xl sm:text-4xl text-brand-dark">
+        #{tagName}
+      </h1>
+      <p class="text-sm text-slate-500">
+        Mostrando {posts.length} {posts.length === 1 ? 'artículo' : 'artículos'} asociados a este tema.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {posts.map((post) => (
+        <PostCard
+          title={post.title}
+          description={post.description}
+          slug={post.slug}
+          image={post.image}
+          category={post.category}
+          pubDate={post.pubDate}
+          author={post.author}
+        />
+      ))}
+    </div>
+
+    <div class="pt-8 border-t border-slate-100">
+      <a href={url('/blog/etiqueta')} class="text-xs font-bold text-brand-primary hover:underline">
+        ← Volver a todas las etiquetas
+      </a>
+    </div>
+  </div>
+</PageLayout>

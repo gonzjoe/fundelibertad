@@ -1,11 +1,14 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import PageLayout from '../layouts/PageLayout.astro';
 import AboutSection from '../components/sections/AboutSection';
 ---
 
-<Layout
+<PageLayout
   title="Nosotros | FUNDELIBERTAD - Historia, Misión y Equipo"
   description="Conoce la historia, misión, visión y principios rectores de FUNDELIBERTAD en la defensa de los derechos humanos y el desarrollo comunitario en Medellín."
+  breadcrumbs={[
+    { label: 'Nosotros' }
+  ]}
 >
   <AboutSection client:load />
-</Layout>
+</PageLayout>

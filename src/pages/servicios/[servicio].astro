@@ -1,0 +1,151 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import { SERVICES_LIST } from '../../data';
+import { slugify } from '../../utils/slugify';
+import { url } from '../../lib/base';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  // 1. Servicios desde data.ts
+  const staticServices = SERVICES_LIST.map((srv) => ({
+    params: { servicio: slugify(srv.title) },
+    props: {
+      isContentCollection: false,
+      service: srv,
+    },
+  }));
+
+  // 2. Servicios desde content collection
+  let collectionServices: any[] = [];
+  try {
+    const rawCol = await getCollection('servicios');
+    collectionServices = rawCol.map((entry) => ({
+      params: { servicio: slugify(entry.data.title || entry.id) },
+      props: {
+        isContentCollection: true,
+        entry,
+        service: {
+          id: entry.id,
+          title: entry.data.title,
+          category: entry.data.category,
+          description: entry.data.description,
+          details: entry.data.details,
+          iconName: entry.data.iconName,
+        },
+      },
+    }));
+  } catch (e) {
+    // Si la colección está vacía
+  }
+
+  // Combinar evitando slugs duplicados
+  const map = new Map();
+  for (const item of [...staticServices, ...collectionServices]) {
+    if (!map.has(item.params.servicio)) {
+      map.set(item.params.servicio, item);
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+const { service, isContentCollection, entry } = Astro.props;
+
+let Content = null;
+if (isContentCollection && entry) {
+  const rendered = await render(entry);
+  Content = rendered.Content;
+}
+
+const otherServices = SERVICES_LIST.filter((s) => s.id !== service.id).slice(0, 3);
+---
+
+<PageLayout
+  title={`${service.title} | Servicios FUNDELIBERTAD`}
+  description={service.description}
+  breadcrumbs={[
+    { label: 'Servicios', href: '/servicios' },
+    { label: service.title },
+  ]}
+>
+  <div class="max-w-4xl mx-auto space-y-10 py-6">
+    
+    {/* Encabezado del Servicio */}
+    <header class="space-y-4">
+      <span class="inline-flex px-3.5 py-1 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-bold uppercase tracking-wider">
+        Servicio Gratuito Comunitario
+      </span>
+      <h1 class="font-display font-black text-3xl sm:text-4xl md:text-5xl text-brand-dark tracking-tight">
+        {service.title}
+      </h1>
+      <p class="text-base sm:text-lg text-slate-600 leading-relaxed">
+        {service.description}
+      </p>
+    </header>
+
+    {/* Detalles o Puntos Clave */}
+    {service.details && service.details.length > 0 && (
+      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-100 shadow-xs space-y-6">
+        <h2 class="font-display font-bold text-xl text-slate-900 border-l-3 border-brand-primary pl-3">
+          Alcance y Cobertura de la Asistencia
+        </h2>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {service.details.map((detail: string) => (
+            <li class="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-100/80">
+              <span class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 text-xs font-black">
+                ✓
+              </span>
+              <span class="text-xs font-medium text-slate-700 leading-normal">{detail}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {/* Contenido en Markdown si existe */}
+    {Content && (
+      <div class="bg-white rounded-3xl p-6 sm:p-10 border border-slate-100 shadow-xs prose prose-slate max-w-none text-slate-700 leading-relaxed text-sm">
+        <Content />
+      </div>
+    )}
+
+    {/* Tarjeta de Acción / Solicitud */}
+    <div class="bg-gradient-to-tr from-brand-primary to-brand-dark text-white rounded-3xl p-8 sm:p-10 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+      <div class="space-y-2 text-center md:text-left">
+        <h3 class="font-display font-black text-xl sm:text-2xl">¿Deseas acceder a este servicio?</h3>
+        <p class="text-slate-200 text-xs sm:text-sm max-w-xl">
+          Nuestros abogados y defensores comunitarios revisarán tu caso sin ningún costo ni intermediarios.
+        </p>
+      </div>
+      <a
+        href={`https://wa.me/573002167822?text=${encodeURIComponent(`Hola FUNDELIBERTAD, me interesa solicitar información sobre el servicio: ${service.title}`)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="shrink-0 px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md hover:shadow-xl transition-all"
+      >
+        Solicitar por WhatsApp
+      </a>
+    </div>
+
+    {/* Otros Servicios Relacionados */}
+    <div class="space-y-6 pt-6 border-t border-slate-100">
+      <h3 class="font-display font-bold text-lg text-slate-900">Otros Servicios de Atención</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {otherServices.map((other) => (
+          <a
+            href={url(`/servicios/${slugify(other.title)}`)}
+            class="p-5 rounded-2xl bg-white border border-slate-100 shadow-2xs hover:shadow-md hover:border-brand-primary/30 transition-all block group"
+          >
+            <h4 class="font-bold text-xs text-slate-900 group-hover:text-brand-primary transition-colors mb-2">
+              {other.title}
+            </h4>
+            <p class="text-[11px] text-slate-500 line-clamp-2">
+              {other.description}
+            </p>
+          </a>
+        ))}
+      </div>
+    </div>
+
+  </div>
+</PageLayout>

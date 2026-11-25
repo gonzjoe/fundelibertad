@@ -1,0 +1,57 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import { getAllUnifiedPosts } from '../../../lib/blog';
+import { slugify } from '../../../utils/slugify';
+import { url } from '../../../lib/base';
+
+const posts = await getAllUnifiedPosts();
+const tagMap = new Map<string, number>();
+for (const p of posts) {
+  if (p.tags && Array.isArray(p.tags)) {
+    for (const t of p.tags) {
+      if (t) {
+        tagMap.set(t, (tagMap.get(t) || 0) + 1);
+      }
+    }
+  }
+}
+
+const tags = Array.from(tagMap.entries()).map(([name, count]) => ({
+  name,
+  count,
+  slug: slugify(name),
+}));
+---
+
+<PageLayout
+  title="Etiquetas del Blog | FUNDELIBERTAD"
+  description="Explora todas las etiquetas y temas clave abordados en las publicaciones de FUNDELIBERTAD."
+  breadcrumbs={[
+    { label: 'Blog', href: '/blog' },
+    { label: 'Etiquetas' },
+  ]}
+>
+  <div class="max-w-4xl mx-auto space-y-10 py-6">
+    <header class="space-y-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-brand-primary">Índice de Etiquetas</span>
+      <h1 class="font-display font-black text-3xl sm:text-4xl text-brand-dark">Todas las Etiquetas</h1>
+      <p class="text-sm text-slate-600">
+        Encuentra artículos agrupados por palabras clave y temas de interés comunitario:
+      </p>
+    </header>
+
+    <div class="flex flex-wrap gap-3">
+      {tags.map((tag) => (
+        <a
+          href={url(`/blog/etiqueta/${tag.slug}`)}
+          class="px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-xs font-medium text-slate-700 shadow-2xs hover:border-brand-primary hover:text-brand-primary hover:shadow transition-all flex items-center gap-2 group"
+        >
+          <span>#{tag.name}</span>
+          <span class="px-2 py-0.5 rounded-full bg-slate-100 text-[10px] font-bold text-slate-500 group-hover:bg-brand-primary/10 group-hover:text-brand-primary">
+            {tag.count}
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</PageLayout>

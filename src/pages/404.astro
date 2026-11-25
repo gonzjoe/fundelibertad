@@ -1,0 +1,48 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { url } from '../lib/base';
+---
+
+<PageLayout
+  title="Página no encontrada (404) | FUNDELIBERTAD"
+  description="La página que estás buscando no existe o ha sido movida."
+  breadcrumbs={[
+    { label: 'Error 404' }
+  ]}
+>
+  <div class="py-16 md:py-24 text-center max-w-xl mx-auto space-y-6">
+    <div class="w-24 h-24 mx-auto rounded-3xl bg-brand-primary/10 text-brand-primary flex items-center justify-center font-display font-black text-4xl shadow-inner">
+      404
+    </div>
+    
+    <div class="space-y-2">
+      <h1 class="font-display font-black text-3xl sm:text-4xl text-slate-900 tracking-tight">
+        Página no encontrada
+      </h1>
+      <p class="text-slate-500 text-sm sm:text-base leading-relaxed">
+        Lo sentimos, la dirección a la que intentas acceder no existe, ha cambiado de lugar o fue eliminada.
+      </p>
+    </div>
+
+    <div class="pt-4 flex flex-wrap items-center justify-center gap-3">
+      <a
+        href={url('/')}
+        class="px-6 py-3 rounded-xl bg-brand-primary hover:bg-brand-dark text-white font-bold text-xs shadow-md transition-all"
+      >
+        Ir a la Página Principal
+      </a>
+      <a
+        href={url('/servicios')}
+        class="px-6 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-2xs transition-all"
+      >
+        Ver Servicios
+      </a>
+      <a
+        href={url('/blog')}
+        class="px-6 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-2xs transition-all"
+      >
+        Leer el Blog
+      </a>
+    </div>
+  </div>
+</PageLayout>

@@ -1,0 +1,27 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import ServicesSection from '../../components/sections/ServicesSection';
+import CTA from '../../components/sections/CTA.astro';
+import FAQ from '../../components/sections/FAQ.astro';
+import { url } from '../../lib/base';
+---
+
+<PageLayout
+  title="Servicios y Asesorías Gratuitas | FUNDELIBERTAD"
+  description="Atención jurídica y comunitaria gratuita en 19 áreas especializadas del derecho y el bienestar social en Medellín."
+  breadcrumbs={[
+    { label: 'Servicios' }
+  ]}
+>
+  <div class="space-y-12">
+    <ServicesSection client:load />
+
+    {/* Bloque CTA y Preguntas Frecuentes */}
+    <CTA
+      title="¿Tienes dudas sobre cómo acceder a nuestros servicios?"
+      description="Escríbenos directamente a través de WhatsApp y un defensor de derechos humanos te orientará de forma personalizada."
+    />
+
+    <FAQ />
+  </div>
+</PageLayout>
