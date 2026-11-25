@@ -5,6 +5,7 @@ import Footer from '../components/layout/Footer.astro';
 import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import DonationWrapper from '../components/DonationWrapper';
+import { slugify } from '../utils/slugify';
 import { url } from '../lib/base';
 
 interface Props {
@@ -26,8 +27,15 @@ const {
   image = 'https://lh3.googleusercontent.com/d/1mzMGHUgDdHcX8hpf8DTMLIs2Dv53CCsd',
   category = 'Derechos Humanos',
   tags = [],
-  canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://fundelibertad.org').href,
 } = Astro.props;
+
+// Regla SEO 2: Canónica limpia sin parámetros de seguimiento
+const siteBase = (Astro.site?.href || 'https://fundelibertad.org').replace(/\/$/, '');
+let cleanPath = Astro.url.pathname;
+if (!cleanPath.includes('.') && !cleanPath.endsWith('/')) {
+  cleanPath += '/';
+}
+const canonicalURL = Astro.props.canonicalURL || `${siteBase}${cleanPath}`;
 
 const dateObj = new Date(pubDate);
 const dateIso = dateObj.toISOString();
@@ -79,8 +87,8 @@ const schemaBlogPosting = {
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <Breadcrumbs
       items={[
-        { label: 'Blog', href: '/blog' },
-        { label: category, href: `/blog/categoria/${category.toLowerCase().replace(/\s+/g, '-')}` },
+        { label: 'Blog', href: '/blog/' },
+        { label: category, href: `/blog/categoria/${slugify(category)}/` },
         { label: title },
       ]}
     />
@@ -92,7 +100,7 @@ const schemaBlogPosting = {
     <header class="space-y-4 text-center">
       {category && (
         <a
-          href={url(`/blog/categoria/${category.toLowerCase().replace(/\s+/g, '-')}`)}
+          href={url(`/blog/categoria/${slugify(category)}/`)}
           class="inline-flex px-3.5 py-1 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-bold uppercase tracking-wider hover:bg-brand-primary hover:text-white transition-colors"
         >
           {category}
@@ -136,13 +144,13 @@ const schemaBlogPosting = {
       <slot />
     </div>
 
-    {/* Etiquetas (Tags) */}
+    {/* Etiquetas (Tags) con slugify */}
     {tags && tags.length > 0 && (
       <div class="pt-4 flex flex-wrap items-center gap-2">
         <span class="text-xs font-bold text-slate-400 mr-1">Etiquetas:</span>
         {tags.map((tag) => (
           <a
-            href={url(`/blog/etiqueta/${tag.toLowerCase().replace(/\s+/g, '-')}`)}
+            href={url(`/blog/etiqueta/${slugify(tag)}/`)}
             class="px-3 py-1 rounded-xl bg-slate-100 text-slate-600 hover:bg-brand-primary hover:text-white transition-colors text-xs font-medium"
           >
             #{tag}
@@ -154,7 +162,7 @@ const schemaBlogPosting = {
     {/* Botón Volver */}
     <div class="pt-6 border-t border-slate-100 flex justify-start">
       <a
-        href={url('/blog')}
+        href={url('/blog/')}
         class="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-brand-primary transition-colors bg-white hover:bg-slate-50 px-5 py-2.5 rounded-xl shadow-xs border border-slate-200"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">

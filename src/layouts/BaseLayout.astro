@@ -14,8 +14,15 @@ const {
   description = 'Más de 15 años promoviendo la paz, brindando asesoría jurídica gratuita y apoyando el desarrollo de familias y jóvenes vulnerables en la Comuna 15 Guayabal, Medellín.',
   image = 'https://lh3.googleusercontent.com/d/1nD4GYM2rbdNHtX0xdR3yI0XlC7MQfzps',
   type = 'website',
-  canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://fundelibertad.org').href,
 } = Astro.props;
+
+// Regla SEO 2: URL Canónica limpia sin parámetros de seguimiento (?utm_..., ?ref=..., ?sort=...)
+const siteBase = (Astro.site?.href || 'https://fundelibertad.org').replace(/\/$/, '');
+let cleanPath = Astro.url.pathname;
+if (!cleanPath.includes('.') && !cleanPath.endsWith('/')) {
+  cleanPath += '/';
+}
+const canonicalURL = Astro.props.canonicalURL || `${siteBase}${cleanPath}`;
 ---
 
 <!doctype html>
@@ -26,7 +33,7 @@ const {
     <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1nD4GYM2rbdNHtX0xdR3yI0XlC7MQfzps" />
     <meta name="generator" content={Astro.generator} />
 
-    <!-- SEO Primario -->
+    <!-- SEO Primario & Canónica exacta -->
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
