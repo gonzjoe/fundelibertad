@@ -157,6 +157,18 @@ export default function Header({ currentPath = '/', onDonateClick }: HeaderProps
             </a>
 
             <a
+              id="nav-blog-btn"
+              href={url('/blog')}
+              className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
+                isCurrentPath(url('/blog'))
+                  ? 'bg-sky-50 text-brand-primary font-semibold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              Blog
+            </a>
+
+            <a
               id="nav-contact-btn"
               href={url('/contacto')}
               className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
@@ -253,6 +265,16 @@ export default function Header({ currentPath = '/', onDonateClick }: HeaderProps
                   }`}
                 >
                   Actividades
+                </a>
+                <a
+                  id="mobile-nav-blog-btn"
+                  href={url('/blog')}
+                  onClick={() => setIsOpen(false)}
+                  className={`block w-full text-left px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+                    isCurrentPath(url('/blog')) ? 'bg-sky-50 text-brand-primary font-bold' : 'hover:bg-slate-50'
+                  }`}
+                >
+                  Blog
                 </a>
                 <a
                   id="mobile-nav-contact-btn"

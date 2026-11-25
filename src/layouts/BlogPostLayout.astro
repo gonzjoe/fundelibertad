@@ -1,7 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import Header from '../components/layout/Header.astro';
-import Footer from '../components/layout/Footer.astro';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import Breadcrumbs from '../components/layout/Breadcrumbs.astro';
 import FloatingWhatsApp from '../components/FloatingWhatsApp';
 import DonationWrapper from '../components/DonationWrapper';
@@ -82,7 +82,7 @@ const schemaBlogPosting = {
 >
   <script type="application/ld+json" set:html={JSON.stringify(schemaBlogPosting)} />
 
-  <Header currentPath={Astro.url.pathname} />
+  <Header client:load currentPath={Astro.url.pathname} />
 
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
     <Breadcrumbs
@@ -174,7 +174,7 @@ const schemaBlogPosting = {
 
   </article>
 
-  <Footer />
+  <Footer client:load />
   <FloatingWhatsApp client:load />
   <DonationWrapper client:load />
 </BaseLayout>
