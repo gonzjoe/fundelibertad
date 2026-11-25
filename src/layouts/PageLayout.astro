@@ -1,10 +1,10 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Footer from '../components/Footer.astro';
 import Breadcrumbs, { type BreadcrumbItem } from '../components/layout/Breadcrumbs.astro';
-import FloatingWhatsApp from '../components/FloatingWhatsApp';
-import DonationWrapper from '../components/DonationWrapper';
+import FloatingWhatsApp from '../components/FloatingWhatsApp.astro';
+import DonationModal from '../components/DonationModal.astro';
 
 interface Props {
   title?: string;
@@ -36,7 +36,7 @@ const {
     <slot />
   </main>
 
-  <Footer client:idle />
-  <FloatingWhatsApp client:idle />
-  <DonationWrapper client:idle />
+  <Footer />
+  <FloatingWhatsApp />
+  <DonationModal />
 </BaseLayout>

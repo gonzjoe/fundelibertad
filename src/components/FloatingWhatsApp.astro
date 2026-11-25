@@ -1,0 +1,66 @@
+---
+/**
+ * Botón flotante de WhatsApp nativo en Astro (0 KB de React).
+ * Mantiene la animación CSS, el tooltip a los 4s y el enlace directo.
+ */
+const phoneNumber = '573002167822';
+const message = encodeURIComponent('Hola FUNDELIBERTAD, me gustaría recibir más información, solicitar una asesoría o apoyar su labor.');
+const waUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+---
+
+<div class="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2 pointer-events-none" id="floating-whatsapp-container">
+  {/* Tooltip con temporizador nativo */}
+  <div
+    id="whatsapp-tooltip"
+    class="bg-white p-3.5 rounded-2xl shadow-xl border border-emerald-100 max-w-xs text-xs pointer-events-auto flex items-start gap-2 text-slate-700 font-sans transition-all duration-300 opacity-0 translate-y-3 pointer-events-none data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0 data-[visible=true]:pointer-events-auto"
+  >
+    <div class="space-y-1">
+      <p class="font-semibold text-emerald-800 flex items-center gap-1">
+        <span>🟢 En línea</span>
+        <span class="text-[10px] bg-emerald-50 text-emerald-600 px-1.5 py-0.5 rounded font-normal">WhatsApp</span>
+      </p>
+      <p class="leading-relaxed">¿Necesitas asesoría legal gratuita o reportar un caso? Escríbenos directamente.</p>
+    </div>
+    <button
+      id="close-wa-tooltip"
+      type="button"
+      class="p-0.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors shrink-0 cursor-pointer"
+      aria-label="Cerrar notificación de WhatsApp"
+    >
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <a
+    id="whatsapp-floating-btn"
+    href={waUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-emerald-200/50 cursor-pointer pointer-events-auto hover:scale-105 active:scale-95 transition-transform"
+    title="Contáctanos por WhatsApp"
+    aria-label="Abrir chat de WhatsApp de FUNDELIBERTAD"
+  >
+    <svg
+      class="w-7 h-7 fill-white"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.454L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.74.002-2.599-1.008-5.045-2.847-6.882C16.643 2.146 14.21 1.135 11.64 1.135c-5.441 0-9.866 4.372-9.87 9.743 0 1.637.453 3.235 1.312 4.646l-.991 3.615 3.73-.969-.174-.11zm11.381-6.195c-.328-.163-1.936-.945-2.235-1.053-.298-.108-.517-.163-.734.163-.218.326-.843 1.053-1.034 1.27-.19.218-.381.245-.71.082-.328-.163-1.385-.506-2.637-1.613-.974-.863-1.631-1.93-1.821-2.256-.19-.327-.02-.503.143-.665.148-.145.328-.381.492-.572.163-.19.218-.327.327-.544.11-.218.055-.408-.027-.571-.082-.164-.734-1.752-1.006-2.405-.264-.635-.53-.548-.734-.559-.19-.01-.408-.012-.626-.012-.218 0-.572.082-.871.408-.299.327-1.14 1.114-1.14 2.719 0 1.604 1.168 3.155 1.332 3.372.163.218 2.298 3.472 5.568 4.86.777.33 1.383.527 1.854.677.781.246 1.492.211 2.054.128.627-.093 1.936-.789 2.209-1.55.272-.763.272-1.415.19-1.55-.082-.136-.299-.218-.627-.381z" />
+    </svg>
+  </a>
+</div>
+
+<script is:inline>
+  // Mostrar notificación a los 4 segundos con JS nativo (0 KB React)
+  setTimeout(() => {
+    const tooltip = document.getElementById('whatsapp-tooltip');
+    if (tooltip) tooltip.setAttribute('data-visible', 'true');
+  }, 4000);
+
+  document.getElementById('close-wa-tooltip')?.addEventListener('click', () => {
+    const tooltip = document.getElementById('whatsapp-tooltip');
+    if (tooltip) tooltip.setAttribute('data-visible', 'false');
+  });
+</script>
