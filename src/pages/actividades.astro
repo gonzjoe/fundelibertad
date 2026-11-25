@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ActivitiesSection, { type WPActivityItem } from '../components/sections/ActivitiesSection';
+import ActivitiesSection from '../components/sections/ActivitiesSection.astro';
 import { getPosts, getFeaturedImageUrl, getPostCategories, hasValidCategory } from '../lib/wordpress';
 
 // Obtener todas las entradas publicadas en WordPress
@@ -42,5 +42,5 @@ const mappedActivities: WPActivityItem[] = wpPosts.map((post) => {
   title="Actividades y Eventos | FUNDELIBERTAD"
   description="Jornadas de atención, foros, talleres comunitarios y eventos de integración ciudadana."
 >
-  <ActivitiesSection client:idle wpActivities={mappedActivities} />
+  <ActivitiesSection wpActivities={mappedActivities} />
 </Layout>

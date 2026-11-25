@@ -1,0 +1,252 @@
+---
+/**
+ * ProjectsSection nativo en Astro con filtrado y búsqueda instantánea en Vanilla JS.
+ * (0 KB React / 0 KB Motion). Mantiene 100% el diseño, colores y tarjetas.
+ */
+import { url } from '../../lib/base';
+import type { WPActivityItem } from './ActivitiesSection';
+
+interface Props {
+  wpProjects?: WPActivityItem[];
+}
+
+const { wpProjects = [] } = Astro.props;
+
+// Categorías disponibles
+const catsSet = new Set<string>();
+wpProjects.forEach(proj => {
+  if (proj.categories && proj.categories.length > 0) {
+    proj.categories.forEach(c => catsSet.add(c.trim()));
+  } else if (proj.category) {
+    catsSet.add(proj.category.trim());
+  }
+});
+const availableCategories = Array.from(catsSet).filter(c => c.toLowerCase() !== 'proyectos' && c.toLowerCase() !== 'uncategorized');
+
+const getWordExcerpt = (textOrHtml: string, maxWords: number = 50): string => {
+  if (!textOrHtml) return '';
+  const plain = textOrHtml
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const words = plain.split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) return plain;
+  return words.slice(0, maxWords).join(' ') + '...';
+};
+---
+
+<div class="space-y-10 pb-16 font-sans text-left animate-fade-in" id="projects-section-container">
+  {/* Introduction banner */}
+  <div class="bg-white rounded-3xl p-8 sm:p-12 border border-slate-100 shadow-xs space-y-4">
+    <span class="text-xs font-bold text-sky-800 uppercase tracking-widest block">Proyectos</span>
+    <h1 class="font-display font-black text-3xl sm:text-4xl text-brand-dark tracking-tight leading-none">
+      Iniciativas de Impacto Comunitario
+    </h1>
+    <div class="w-16 h-1 bg-brand-green rounded-full"></div>
+    <p class="text-sm text-slate-600 max-w-3xl leading-relaxed">
+      Programas de formación ciudadana, prevención social, cultura y fortalecimiento de los Derechos Humanos en la Comuna 15 y el Área Metropolitana de Medellín.
+    </p>
+  </div>
+
+  {/* Category Filter Pills and Search */}
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4" id="projects-filter-bar">
+    <div class="flex flex-wrap items-center gap-2" id="projects-category-filters">
+      <button
+        type="button"
+        data-category="all"
+        class="project-cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer bg-slate-900 text-white shadow-xs"
+      >
+        Todos los Proyectos
+      </button>
+
+      {availableCategories.map((cat) => {
+        const count = wpProjects.filter((p) => {
+          const cats = p.categories && p.categories.length > 0 ? p.categories : [p.category];
+          return cats.some((c) => c.toLowerCase() === cat.toLowerCase());
+        }).length;
+
+        return (
+          <button
+            type="button"
+            data-category={cat.toLowerCase()}
+            class="project-cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300"
+          >
+            {cat} {count > 1 ? `(${count})` : ''}
+          </button>
+        );
+      })}
+    </div>
+
+    {/* Search Input */}
+    <div class="relative w-full md:w-64">
+      <input
+        type="text"
+        id="projects-search-input"
+        placeholder="Buscar proyecto..."
+        class="w-full bg-white border border-slate-200 rounded-2xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 shadow-xs"
+      />
+      <button
+        id="clear-project-search"
+        type="button"
+        class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+
+  {/* Grid of articles */}
+  <div class="space-y-6">
+    <div
+      id="projects-empty-state"
+      class="hidden bg-white rounded-2xl p-12 text-center border border-slate-100 shadow-xs space-y-3"
+    >
+      <p class="text-slate-500 text-sm">
+        No se encontraron proyectos en esta categoría o criterio de búsqueda.
+      </p>
+      <button
+        id="reset-projects-filter"
+        type="button"
+        class="text-xs font-bold text-sky-700 hover:underline cursor-pointer"
+      >
+        Ver todos los proyectos
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="projects-list-grid">
+      {wpProjects.map((proj) => {
+        const catsArr = (proj.categories && proj.categories.length > 0 ? proj.categories : [proj.category]).map(c => c.toLowerCase());
+        return (
+          <div
+            id={`project-card-${proj.id}`}
+            data-categories={JSON.stringify(catsArr)}
+            data-search={`${proj.title} ${proj.description} ${catsArr.join(' ')}`.toLowerCase()}
+            class="project-card bg-white rounded-2xl border border-slate-100 shadow-xs overflow-hidden text-left flex flex-col justify-between hover:shadow-md transition-all duration-300 group"
+          >
+            <div>
+              <div class="w-full h-52 bg-slate-100 border-b border-slate-100 overflow-hidden relative flex items-center justify-center">
+                <img
+                  src={proj.image}
+                  alt={proj.title}
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <span class="absolute top-3 left-3 bg-white/95 text-slate-800 border border-slate-200/80 shadow-xs px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider z-20">
+                  {proj.category}
+                </span>
+              </div>
+              <div class="p-5 space-y-3">
+                <h3 class="font-display font-bold text-base text-slate-900 leading-snug group-hover:text-sky-800 transition-colors">
+                  {proj.title}
+                </h3>
+                <p class="text-xs text-slate-500 leading-relaxed">
+                  {getWordExcerpt(proj.content || proj.description, 50)}
+                </p>
+                {proj.date && (
+                  <p class="text-[10px] text-slate-400 font-mono pt-1">
+                    {proj.date}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div class="p-5 pt-0">
+              <a
+                href={url(`/blog/${proj.slug}/`)}
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm hover:shadow transition-all duration-200 group/btn w-fit cursor-pointer"
+              >
+                <span>Leer más</span>
+                <svg class="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  // Filtro reactivo ultra rápido en JavaScript Vanilla para Proyectos
+  (function() {
+    let activeCategory = 'all';
+    let searchQuery = '';
+
+    const cards = Array.from(document.querySelectorAll('.project-card'));
+    const buttons = Array.from(document.querySelectorAll('.project-cat-btn'));
+    const searchInput = document.getElementById('projects-search-input');
+    const clearBtn = document.getElementById('clear-project-search');
+    const emptyState = document.getElementById('projects-empty-state');
+    const resetBtn = document.getElementById('reset-projects-filter');
+
+    function applyFilter() {
+      let visibleCount = 0;
+      const query = searchQuery.trim().toLowerCase();
+
+      cards.forEach(card => {
+        const cats = JSON.parse(card.getAttribute('data-categories') || '[]');
+        const searchTarget = card.getAttribute('data-search') || '';
+
+        const matchesCat = (activeCategory === 'all') || cats.some(c => c.toLowerCase() === activeCategory.toLowerCase());
+        const matchesQuery = !query || searchTarget.includes(query);
+
+        if (matchesCat && matchesQuery) {
+          card.classList.remove('hidden');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      if (emptyState) {
+        if (visibleCount === 0) emptyState.classList.remove('hidden');
+        else emptyState.classList.add('hidden');
+      }
+
+      // Estilos activos en botones
+      buttons.forEach(btn => {
+        const cat = btn.getAttribute('data-category');
+        if (cat === activeCategory) {
+          btn.className = "project-cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer bg-slate-900 text-white shadow-xs";
+        } else {
+          btn.className = "project-cat-btn px-5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300";
+        }
+      });
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCategory = btn.getAttribute('data-category') || 'all';
+        applyFilter();
+      });
+    });
+
+    searchInput?.addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      if (clearBtn) {
+        if (searchQuery) clearBtn.classList.remove('hidden');
+        else clearBtn.classList.add('hidden');
+      }
+      applyFilter();
+    });
+
+    clearBtn?.addEventListener('click', () => {
+      if (searchInput) searchInput.value = '';
+      searchQuery = '';
+      clearBtn.classList.add('hidden');
+      applyFilter();
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      activeCategory = 'all';
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      if (clearBtn) clearBtn.classList.add('hidden');
+      applyFilter();
+    });
+  })();
+</script>

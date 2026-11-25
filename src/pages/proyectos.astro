@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ProjectsSection from '../components/sections/ProjectsSection';
+import ProjectsSection from '../components/sections/ProjectsSection.astro';
 import { getPosts, getFeaturedImageUrl, getPostCategories, hasValidCategory } from '../lib/wordpress';
 import type { WPActivityItem } from '../components/sections/ActivitiesSection';
 
@@ -57,5 +57,5 @@ const mappedWpProjects: WPActivityItem[] = wpProjectPosts.map((post) => {
   title="Proyectos Sociales | FUNDELIBERTAD"
   description="Iniciativas de alto impacto social, derechos humanos y convivencia ciudadana en Medellín y Antioquia."
 >
-  <ProjectsSection client:idle wpProjects={mappedWpProjects} />
+  <ProjectsSection wpProjects={mappedWpProjects} />
 </Layout>
